@@ -187,6 +187,18 @@
 </head>
 <body>
 
+<!-- CỔNG MẬT KHẨU (thử nghiệm) -->
+<div id="gate" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#eef1ff,#f4f6fb);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif">
+  <div style="background:#fff;border-radius:20px;box-shadow:0 18px 50px rgba(31,42,68,.14);padding:34px;max-width:380px;width:100%;text-align:center">
+    <div style="font-size:46px">🔒</div>
+    <h2 style="margin:6px 0;color:#1f2a44">Khu vực thử nghiệm</h2>
+    <p style="color:#6b7794;font-size:14px;margin:4px 0 16px">Nhập mật khẩu để vào học.</p>
+    <input id="gatePass" type="password" placeholder="Mật khẩu" autocomplete="off" style="width:100%;padding:12px 14px;border:1px solid #e4e8f1;border-radius:10px;font-size:16px;outline:none;box-sizing:border-box" />
+    <div id="gateErr" style="display:none;color:#dc2626;font-size:14px;margin-top:8px">Sai mật khẩu, thử lại nhé.</div>
+    <button id="gateBtn" style="margin-top:14px;width:100%;background:#4f6ef7;color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer">Vào học →</button>
+  </div>
+</div>
+
 <!-- ONBOARDING -->
 <div class="onboard-wrap" id="onboard">
   <div class="onboard-card">
@@ -1820,8 +1832,27 @@ document.getElementById('editProfile').addEventListener('click',()=>{ob.phone.va
 document.getElementById('resetProg').addEventListener('click',()=>{if(confirm('Xóa tiến độ và sao thưởng? Bắt đầu học lại từ bài 1.')){progress={currentIndex:0,results:{},totalStars:0};saveProg();updateTop();showView('curriculum')}});
 document.getElementById('clearAll').addEventListener('click',()=>{if(confirm('Xóa TẤT CẢ dữ liệu? Không thể hoàn tác.')){memStore={};try{localStorage.clear()}catch(e){}location.reload()}});
 
+/* ===== CỔNG MẬT KHẨU ===== */
+const PASS_HASH='e78e2a15d4bc24db96299e38e53ef75bfcdbf618deb08bd988e1b37ab388ce50';
+async function sha256hex(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
+function gateGet(){try{return localStorage.getItem('gsai_gate')}catch(e){return null}}
+async function gateInit(){
+  const g=document.getElementById('gate');
+  if(gateGet()===PASS_HASH){g.style.display='none';boot();return}
+  const pass=document.getElementById('gatePass'),btn=document.getElementById('gateBtn'),err=document.getElementById('gateErr');
+  async function tryUnlock(){
+    err.style.display='none';
+    let h='';try{h=await sha256hex(pass.value)}catch(e){h=''}
+    if(h===PASS_HASH){try{localStorage.setItem('gsai_gate',PASS_HASH)}catch(e){}g.style.display='none';boot()}
+    else{err.style.display='block';pass.value='';pass.focus()}
+  }
+  btn.onclick=tryUnlock;
+  pass.addEventListener('keydown',function(e){if(e.key==='Enter')tryUnlock()});
+  pass.focus();
+}
+
 /* ===== START ===== */
-boot();
+gateInit();
 </script>
 </body>
 </html>
