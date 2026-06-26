@@ -13,6 +13,9 @@ for g, lessons in steps.items():
     for idx, arr in lessons.items():
         for st in arr:
             out = os.path.join(outdir, st["a"])
+            if os.path.exists(out):
+                print("skip", st["a"])
+                continue
             try:
                 n = synth(st["n"], VOICE, out)
                 print("OK", st["a"], n, "bytes")

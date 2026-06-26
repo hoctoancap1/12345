@@ -20,7 +20,7 @@ def synth(text, voice, out_path, speed=""):
     if not url:
         raise RuntimeError("Khong co async url: " + json.dumps(j, ensure_ascii=False))
     last = None
-    for i in range(40):
+    for i in range(120):
         time.sleep(2)
         try:
             a = urllib.request.urlopen(url, timeout=60)
