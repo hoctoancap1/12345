@@ -142,6 +142,10 @@
   .tenframe span.f2{background:#4f9bff;border-color:#2f7be0}
   .colcalc{font-family:'Courier New',monospace;font-size:28px;line-height:1.35;display:inline-block;text-align:right}
   .colcalc .bar{border-top:3px solid var(--ink);display:block;padding-top:2px}
+  /* Bước giảng hiện từ từ */
+  .step-card{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease;margin-bottom:14px}
+  .step-card.in{opacity:1;transform:none}
+  .step-card.cur{filter:drop-shadow(0 6px 18px rgba(79,110,247,.32))}
 
   /* Quiz */
   .quiz-q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff}
@@ -330,6 +334,10 @@ function saveProg(){LS.set('gsai_progress',progress)}
 function saveSettings(){LS.set('gsai_settings',settings);checkKey()}
 
 /* mức đạt dùng PASS_RATIO (định nghĩa trong bộ sinh câu hỏi) */
+
+/* ===== BƯỚC GIẢNG (step-by-step, đồng bộ giọng đọc) ===== */
+let STEPS={};
+try{fetch('steps.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){STEPS=d||{}}).catch(function(){})}catch(e){}
 
 /* ===== HELPERS ===== */
 function esc(t){return(''+t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -1702,15 +1710,60 @@ function openLesson(idx){
     +'<div class="ltabs"><button class="ltab active" data-pane="learn">📖 Học bài</button><button class="ltab" data-pane="ask">💬 Hỏi bài AI</button><button class="ltab" data-pane="test">✅ Kiểm tra</button></div>'
     +'<div class="lpane active" id="pane-learn"></div><div class="lpane" id="pane-ask"></div><div class="lpane" id="pane-test"></div>';
   document.getElementById('backCurr').onclick=()=>showView('curriculum');
-  vLesson.querySelectorAll('.ltab').forEach(t=>t.onclick=()=>{stopSpeak();vLesson.querySelectorAll('.ltab').forEach(x=>x.classList.remove('active'));vLesson.querySelectorAll('.lpane').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById('pane-'+t.dataset.pane).classList.add('active');if(t.dataset.pane==='learn')autoSpeakLearn()});
-  const learnHTML=(RICH[activeGrade]&&RICH[activeGrade][idx])||les.visual;
-  document.getElementById('pane-learn').innerHTML='<div class="card"><div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px;flex-wrap:wrap"><button class="btn ghost sm" id="replayBtn">🔁 Nghe lại từ đầu</button><button class="btn ghost sm" id="speakBtn">🔊 Nghe giảng bài</button></div>'+learnHTML+'<div style="margin-top:16px;text-align:center"><button class="btn big" id="goTest">Mình hiểu rồi, làm kiểm tra ✅</button></div></div>';
-  document.getElementById('speakBtn').onclick=function(){speakLesson(this)};
-  document.getElementById('replayBtn').onclick=replayLesson;
-  document.getElementById('goTest').onclick=()=>{vLesson.querySelector('.ltab[data-pane="test"]').click()};
-  autoSpeakLearn();
+  vLesson.querySelectorAll('.ltab').forEach(t=>t.onclick=()=>{stopSpeak();vLesson.querySelectorAll('.ltab').forEach(x=>x.classList.remove('active'));vLesson.querySelectorAll('.lpane').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById('pane-'+t.dataset.pane).classList.add('active')});
+  initLearnPane(idx);
   initAskPane(idx);
   initTestPane(idx);
+}
+function initLearnPane(idx){
+  const pane=document.getElementById('pane-learn');
+  const les=CUR.lessons[idx];
+  const steps=(STEPS[activeGrade]&&STEPS[activeGrade][idx])||null;
+  if(steps&&steps.length){buildStepPlayer(pane,idx,steps);return}
+  const learnHTML=(RICH[activeGrade]&&RICH[activeGrade][idx])||les.visual;
+  pane.innerHTML='<div class="card"><div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px;flex-wrap:wrap"><button class="btn ghost sm" id="replayBtn">🔁 Nghe lại từ đầu</button><button class="btn ghost sm" id="speakBtn">🔊 Nghe giảng bài</button></div>'+learnHTML+'<div style="margin-top:16px;text-align:center"><button class="btn big" id="goTest">Mình hiểu rồi, làm kiểm tra ✅</button></div></div>';
+  document.getElementById('speakBtn').onclick=function(){speakLesson(this)};
+  document.getElementById('replayBtn').onclick=replayLesson;
+  document.getElementById('goTest').onclick=function(){vLesson.querySelector('.ltab[data-pane="test"]').click()};
+  autoSpeakLearn();
+}
+function ttsStep(text,cb){
+  if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(text);u.lang='vi-VN';u.rate=0.9;const v=pickViVoice();if(v)u.voice=v;u.onend=cb;try{speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){cb()}}else setTimeout(cb,2500);
+}
+function buildStepPlayer(pane,idx,steps){
+  pane.innerHTML='<div class="card">'
+    +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">'
+      +'<button class="btn" id="spStart">▶ Nghe cô giảng</button>'
+      +'<button class="btn ghost sm" id="spPause" style="display:none">⏸ Tạm dừng</button>'
+      +'<button class="btn ghost sm" id="spReplay" style="display:none">🔁 Từ đầu</button>'
+      +'<span class="hint" id="spProg" style="margin-left:auto"></span>'
+    +'</div><div id="stepHost"></div>'
+    +'<div style="margin-top:16px;text-align:center"><button class="btn big" id="goTest">Mình hiểu rồi, làm kiểm tra ✅</button></div></div>';
+  const host=document.getElementById('stepHost');
+  const bStart=document.getElementById('spStart'),bPause=document.getElementById('spPause'),bReplay=document.getElementById('spReplay'),prog=document.getElementById('spProg');
+  let cur=-1,paused=false;
+  function reveal(n){
+    while(host.children.length<=n){const k=host.children.length;const d=document.createElement('div');d.className='step-card';d.innerHTML=steps[k].h;host.appendChild(d);void d.offsetWidth;d.classList.add('in')}
+    for(let i=0;i<host.children.length;i++)host.children[i].classList.toggle('cur',i===n);
+    if(host.children[n])host.children[n].scrollIntoView({behavior:'smooth',block:'center'});
+    prog.textContent='Bước '+(n+1)+'/'+steps.length;
+  }
+  function play(n){
+    if(n>=steps.length){finish();return}
+    cur=n;reveal(n);audioStop();
+    const a=new Audio('audio/steps/'+steps[n].a);audioEl=a;
+    a.onended=function(){if(!paused)play(n+1)};
+    a.onerror=function(){if(audioEl===a)audioEl=null;ttsStep(steps[n].n,function(){if(!paused)play(n+1)})};
+    const p=a.play();if(p&&p.catch)p.catch(function(){if(audioEl===a){audioEl=null;ttsStep(steps[n].n,function(){if(!paused)play(n+1)})}});
+  }
+  function finish(){cur=steps.length;paused=false;bPause.style.display='none';bStart.style.display='inline-flex';bStart.textContent='✅ Đã giảng xong — nghe lại?';prog.textContent='Xong';}
+  function startPlay(){paused=false;bStart.style.display='none';bStart.textContent='▶ Nghe cô giảng';bPause.style.display='inline-flex';bPause.textContent='⏸ Tạm dừng';bReplay.style.display='inline-flex';play(cur<0||cur>=steps.length?0:cur)}
+  bStart.onclick=function(){startPlay()};
+  bPause.onclick=function(){if(paused){paused=false;bPause.textContent='⏸ Tạm dừng';play(cur)}else{paused=true;bPause.textContent='▶ Tiếp tục';audioStop();try{if('speechSynthesis' in window)speechSynthesis.cancel()}catch(e){}}};
+  bReplay.onclick=function(){paused=false;audioStop();host.innerHTML='';cur=-1;startPlay()};
+  document.getElementById('goTest').onclick=function(){stopSpeak();vLesson.querySelector('.ltab[data-pane="test"]').click()};
+  reveal(0);cur=0;
+  setTimeout(function(){if(!paused&&cur===0&&!isSpeaking())startPlay()},500);
 }
 
 /* Hỏi bài AI */
