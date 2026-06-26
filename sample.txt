@@ -1,0 +1,8 @@
+Chào con! Hôm nay cô trò mình sẽ học một bài rất thú vị, đó là: Một phần mấy.
+Con thử tưởng tượng nhé: con có một chiếc bánh, và con muốn chia cho các bạn sao cho thật công bằng. Đó chính là lúc mình dùng "một phần mấy".
+Bước đầu tiên, mình cần nhớ điều quan trọng nhất: các phần phải bằng nhau. Nếu chia lệch, chỗ to chỗ nhỏ, thì không được tính đâu nhé.
+Tiếp theo, mình cùng xem ví dụ thứ nhất. Cô có một chiếc bánh. Cô chia thành hai phần bằng nhau, rồi lấy một phần. Một trong hai phần bằng nhau, mình gọi là một phần hai.
+Bây giờ mình thử chia nhỏ hơn. Lần này cô chia chiếc bánh thành bốn phần bằng nhau, và lấy một phần. Một trong bốn phần, mình gọi là một phần tư.
+Con để ý nhé: số ở phía dưới cho biết mình chia thành mấy phần; còn số ở phía trên cho biết mình lấy mấy phần. Chia càng nhiều phần thì mỗi phần càng nhỏ.
+Cuối cùng, mình học cách tìm một phần mấy của một số. Ví dụ: một phần tư của mười hai cái kẹo là bao nhiêu? Rất đơn giản: mình lấy mười hai chia cho bốn, bằng ba. Vậy một phần tư của mười hai là ba cái kẹo.
+Con thấy không, chỉ cần nhớ hai điều: chia cho đều, và lấy số đó chia cho mẫu số, là con làm được hết. Giỏi lắm! Bây giờ con hãy bấm vào phần Kiểm tra để thử sức nhé!
