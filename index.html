@@ -401,7 +401,7 @@ function shapesSVG(){
 }
 
 /* ===== BỘ SINH CÂU HỎI (30 câu/bài, đề đổi mỗi lần) ===== */
-const QPER=30, PASS_RATIO=0.8;
+const QPER=30, PASS_RATIO=0.9;
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 function pick(a){return a[ri(0,a.length-1)]}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=ri(0,i),t=a[i];a[i]=a[j];a[j]=t}return a}
@@ -1924,7 +1924,7 @@ function buildReview(wrongs){
 function finishTest(idx,correct,total){
   const ratio=correct/total;
   const passed=ratio>=PASS_RATIO;
-  const stars=ratio>=0.9?3:ratio>=PASS_RATIO?2:0;
+  const stars=ratio>=1?3:ratio>=PASS_RATIO?2:0;
   const prev=progress.results[idx]||{bestScore:0,bestTotal:total,stars:0,passed:false};
   const newStars=Math.max(stars,prev.stars||0);
   const deltaStars=Math.max(0,newStars-(prev.stars||0));
@@ -1941,10 +1941,10 @@ function showReward(idx,correct,total,passed,stars){
   if(passed){
     card.innerHTML='<div class="reward-emoji">🎉</div><div class="reward-stars">'
       +Array.from({length:3}).map((_,i)=>'<span class="s">'+(i<stars?'⭐':'☆')+'</span>').join('')
-      +'</div><h2>Giỏi quá!</h2><p>Con đúng '+correct+'/'+total+' câu và nhận được '+stars+' sao!'+(stars<3?' Đạt ≥ 90% để được 3 sao nhé.':'')+'</p>'
+      +'</div><h2>Giỏi quá!</h2><p>Con đúng '+correct+'/'+total+' câu và nhận được '+stars+' sao!'+(stars<3?' Đúng hết cả '+total+' câu để được 3 sao nhé.':'')+'</p>'
       +'<div>'+(hasNext?'<button class="btn green" id="rwNext">Bài tiếp theo →</button> ':'')+'<button class="btn ghost" id="rwClose">📌 Xem lại bài làm</button></div>';
   } else {
-    card.innerHTML='<div class="reward-emoji">💪</div><h2>Cố lên nào!</h2><p>Con đúng '+correct+'/'+total+' câu, cần đúng ≥ '+need+'/'+total+' (80%) để qua bài. Hãy xem kỹ các câu sai và cách làm bên dưới nhé!</p>'
+    card.innerHTML='<div class="reward-emoji">💪</div><h2>Cố lên nào!</h2><p>Con đúng '+correct+'/'+total+' câu, cần đúng ≥ '+need+'/'+total+' (90%) để qua bài. Hãy xem kỹ các câu sai và cách làm bên dưới nhé!</p>'
       +'<div><button class="btn" id="rwReview">📌 Xem câu sai</button> <button class="btn ghost" id="rwRetry">🔄 Làm lại</button> <button class="btn ghost" id="rwLearn">📖 Học lại bài</button></div>';
   }
   document.getElementById('reward').classList.add('show');
