@@ -198,5 +198,67 @@
       {"a":"g5_l9_s3.mp3","n":"Tiếp theo, từ công thức gốc con suy ra hai công thức kia. Quãng đường bằng vận tốc nhân thời gian. Thời gian bằng quãng đường chia vận tốc.","h":"<div class='keybox'><span class='lab'>💡 Suy ra</span>Quãng đường = v × t · Thời gian = s ÷ v.</div>"},
       {"a":"g5_l9_s4.mp3","n":"Cuối cùng, một mẹo nhớ: con vẽ tam giác với quãng đường ở trên, vận tốc và thời gian ở dưới; che cái cần tìm là ra công thức. Giỏi lắm, mình sang kiểm tra!","h":"<div class='tipbox'><span class='lab'>✨ Mẹo nhớ</span>Tam giác s trên, v và t dưới — che cái cần tìm.</div>"}
     ]
+  },
+  "2": {
+    "0": [
+      {"a":"g2_l0_s1.mp3","n":"Chào con! Hôm nay mình học về số có hai chữ số. Mỗi số như vậy có hai phần: hàng chục ở bên trái và hàng đơn vị ở bên phải.","h":"<div class='hook'>🔢 Số hai chữ số có <b>hàng chục</b> (trái) và <b>hàng đơn vị</b> (phải).</div>"},
+      {"a":"g2_l0_s2.mp3","n":"Bước đầu tiên, mình xem số ba mươi tư. Chữ số ba ở bên trái là ba chục, tức là ba mươi. Chữ số bốn ở bên phải là bốn đơn vị. Ghép lại thành ba mươi tư.","h":"<div class='exbox'><div class='bignum'>34</div><div>3 chục · 4 đơn vị</div></div>"},
+      {"a":"g2_l0_s3.mp3","n":"Con nhớ nhé: chữ số bên trái luôn là hàng chục, chữ số bên phải luôn là hàng đơn vị.","h":"<div class='keybox'><span class='lab'>💡 Nhớ</span>Trái = chục · Phải = đơn vị.</div>"},
+      {"a":"g2_l0_s4.mp3","n":"Con thử đọc thêm: số bảy mươi hai có bảy chục và hai đơn vị. Giỏi lắm, mình sang kiểm tra nào!","h":"<div class='stepcard'><div class='n'>72</div><div>7 chục · 2 đơn vị</div></div>"}
+    ],
+    "1": [
+      {"a":"g2_l1_s1.mp3","n":"Chào con! Hôm nay mình học phép cộng có nhớ. Khi cộng hàng đơn vị mà được số lớn hơn chín, con phải nhớ một sang hàng chục.","h":"<div class='hook'>➕ Cộng đơn vị mà quá 9 thì <b>nhớ 1</b> sang hàng chục.</div>"},
+      {"a":"g2_l1_s2.mp3","n":"Bước đầu tiên, mình tính hai mươi bảy cộng mười lăm. Con cộng hàng đơn vị trước: bảy cộng năm bằng mười hai. Con viết hai, nhớ một.","h":"<div class='exbox'><div>7 + 5 = 12 → viết <b>2</b>, nhớ <b>1</b></div></div>"},
+      {"a":"g2_l1_s3.mp3","n":"Tiếp theo, con cộng hàng chục và cộng thêm số nhớ. Hai cộng một bằng ba, thêm một số nhớ là bốn. Vậy kết quả là bốn mươi hai.","h":"<div class='exbox'><div class='colcalc'>&nbsp;27<br>+15<br><span class='bar'>&nbsp;42</span></div></div>"},
+      {"a":"g2_l1_s4.mp3","n":"Lỗi hay quên nhất là quên cộng số nhớ vào hàng chục. Con nhớ luôn cộng thêm một đã nhớ nhé. Giỏi lắm!","h":"<div class='warnbox'><span class='lab'>⚠️ Hay quên</span>Đừng quên cộng <b>số nhớ</b> vào hàng chục!</div>"}
+    ],
+    "2": [
+      {"a":"g2_l2_s1.mp3","n":"Chào con! Hôm nay mình học phép trừ có nhớ. Khi chữ số ở trên nhỏ hơn chữ số ở dưới, con phải mượn một chục từ hàng bên trái.","h":"<div class='hook'>➖ Trên nhỏ hơn dưới thì <b>mượn 1 chục</b> từ hàng bên trái.</div>"},
+      {"a":"g2_l2_s2.mp3","n":"Bước đầu tiên, mình tính bốn mươi hai trừ mười bảy. Hàng đơn vị: hai nhỏ hơn bảy, con mượn một chục thành mười hai. Mười hai trừ bảy bằng năm.","h":"<div class='exbox'><div>12 − 7 = 5 (đã mượn 1 chục)</div></div>"},
+      {"a":"g2_l2_s3.mp3","n":"Tiếp theo, vì đã mượn một chục nên hàng chục bớt đi một. Bốn bớt một còn ba, ba trừ một bằng hai. Vậy kết quả là hai mươi lăm.","h":"<div class='exbox'><div class='colcalc'>&nbsp;42<br>−17<br><span class='bar'>&nbsp;25</span></div></div>"},
+      {"a":"g2_l2_s4.mp3","n":"Con nhớ kỹ: chỗ nào đã mượn thì hàng bên trái phải bớt đi một. Giỏi lắm, mình sang kiểm tra!","h":"<div class='keybox'><span class='lab'>💡 Nhớ</span>Đã mượn 1 chục → hàng bên trái bớt 1.</div>"}
+    ],
+    "3": [
+      {"a":"g2_l3_s1.mp3","n":"Chào con! Hôm nay mình học bảng nhân hai. Nhân chính là cộng cùng một số nhiều lần cho nhanh.","h":"<div class='hook'>✖️ Nhân = cộng cùng một số nhiều lần.</div>"},
+      {"a":"g2_l3_s2.mp3","n":"Bước đầu tiên, mình xem hai nhân ba. Nghĩa là lấy số hai cộng ba lần: hai cộng hai cộng hai bằng sáu. Vậy hai nhân ba bằng sáu.","h":"<div class='exbox'><div class='bignum'>2 × 3 = 2+2+2 = 6</div></div>"},
+      {"a":"g2_l3_s3.mp3","n":"Tiếp theo, con đọc thuộc bảng nhân hai: hai nhân một là hai, hai nhân hai là bốn, hai nhân ba là sáu, hai nhân bốn là tám, hai nhân năm là mười.","h":"<div class='keybox'><span class='lab'>📖 Bảng nhân 2</span>2 · 4 · 6 · 8 · 10 · 12 · 14 · 16 · 18 · 20.</div>"},
+      {"a":"g2_l3_s4.mp3","n":"Con để ý một mẹo hay: nhân hai chính là gấp đôi số đó lên. Giỏi lắm, mình sang kiểm tra!","h":"<div class='tipbox'><span class='lab'>✨ Mẹo</span>Nhân 2 = gấp đôi số đó.</div>"}
+    ],
+    "4": [
+      {"a":"g2_l4_s1.mp3","n":"Chào con! Hôm nay mình học bảng nhân năm. Bảng này rất dễ nhớ vì các kết quả đếm nhảy năm một.","h":"<div class='hook'>✖️ Bảng nhân 5: đếm nhảy 5, 10, 15…</div>"},
+      {"a":"g2_l4_s2.mp3","n":"Bước đầu tiên, mình xem năm nhân ba. Lấy năm cộng ba lần: năm, mười, mười lăm. Vậy năm nhân ba bằng mười lăm.","h":"<div class='exbox'><div class='bignum'>5 × 3 = 15</div></div>"},
+      {"a":"g2_l4_s3.mp3","n":"Tiếp theo, con đọc bảng nhân năm: năm, mười, mười lăm, hai mươi, hai mươi lăm, ba mươi.","h":"<div class='keybox'><span class='lab'>📖 Bảng nhân 5</span>5 · 10 · 15 · 20 · 25 · 30 · 35 · 40 · 45 · 50.</div>"},
+      {"a":"g2_l4_s4.mp3","n":"Con để ý mẹo nhớ: kết quả bảng nhân năm luôn tận cùng bằng không hoặc năm. Giỏi lắm!","h":"<div class='tipbox'><span class='lab'>✨ Mẹo</span>Kết quả luôn tận cùng là 0 hoặc 5.</div>"}
+    ],
+    "5": [
+      {"a":"g2_l5_s1.mp3","n":"Chào con! Hôm nay mình học bảng chia hai. Chia hai chính là chia một nhóm thành hai phần bằng nhau.","h":"<div class='hook'>➗ Chia 2 = chia đều thành 2 phần bằng nhau.</div>"},
+      {"a":"g2_l5_s2.mp3","n":"Bước đầu tiên, mình xem sáu chia hai. Sáu cái kẹo chia đều cho hai bạn, mỗi bạn được ba cái. Vậy sáu chia hai bằng ba.","h":"<div class='exbox'><div class='bignum'>6 ÷ 2 = 3</div><div>🍬🍬🍬 | 🍬🍬🍬</div></div>"},
+      {"a":"g2_l5_s3.mp3","n":"Tiếp theo, con nhớ phép chia đi đôi với phép nhân. Vì hai nhân ba bằng sáu, nên sáu chia hai bằng ba, và sáu chia ba bằng hai.","h":"<div class='keybox'><span class='lab'>💡 Liên hệ</span>2 × 3 = 6 → 6 ÷ 2 = 3 và 6 ÷ 3 = 2.</div>"},
+      {"a":"g2_l5_s4.mp3","n":"Vậy thuộc bảng nhân hai là con tự suy ra được bảng chia hai. Giỏi lắm, mình sang kiểm tra!","h":"<div class='tipbox'><span class='lab'>✨ Mẹo</span>Thuộc nhân 2 → suy ra chia 2.</div>"}
+    ],
+    "6": [
+      {"a":"g2_l6_s1.mp3","n":"Chào con! Hôm nay mình học bảng chia năm. Cũng giống chia hai, đây là chia đều thành các nhóm năm.","h":"<div class='hook'>➗ Bảng chia 5 đi đôi với bảng nhân 5.</div>"},
+      {"a":"g2_l6_s2.mp3","n":"Bước đầu tiên, mình xem mười lăm chia năm. Vì năm nhân ba bằng mười lăm, nên mười lăm chia năm bằng ba.","h":"<div class='exbox'><div class='bignum'>15 ÷ 5 = 3</div><div>vì 5 × 3 = 15</div></div>"},
+      {"a":"g2_l6_s3.mp3","n":"Tiếp theo con thử thêm: hai mươi chia năm bằng bốn, hai mươi lăm chia năm bằng năm.","h":"<div class='keybox'><span class='lab'>📖 Thử</span>20 ÷ 5 = 4 · 25 ÷ 5 = 5.</div>"},
+      {"a":"g2_l6_s4.mp3","n":"Con nhớ: muốn chia năm cho nhanh, hãy nghĩ tới bảng nhân năm trước. Giỏi lắm!","h":"<div class='tipbox'><span class='lab'>✨ Mẹo</span>Nhớ bảng nhân 5 là chia 5 rất nhanh.</div>"}
+    ],
+    "7": [
+      {"a":"g2_l7_s1.mp3","n":"Chào con! Hôm nay mình học các đơn vị đo độ dài: xăng-ti-mét, đề-xi-mét và mét.","h":"<div class='hook'>📏 Đơn vị đo độ dài: cm · dm · m.</div>"},
+      {"a":"g2_l7_s2.mp3","n":"Bước đầu tiên, con nhớ hai điều quan trọng: một đề-xi-mét bằng mười xăng-ti-mét, và một mét bằng một trăm xăng-ti-mét.","h":"<div class='keybox'><span class='lab'>💡 Đổi đơn vị</span>1 dm = 10 cm · 1 m = 100 cm.</div>"},
+      {"a":"g2_l7_s3.mp3","n":"Tiếp theo, con hình dung cho dễ: cái bút chì dài khoảng mười lăm xăng-ti-mét, còn cánh cửa cao khoảng hai mét.","h":"<div class='exbox'><div>✏️ ≈ 15 cm · 🚪 ≈ 2 m</div></div>"},
+      {"a":"g2_l7_s4.mp3","n":"Con thử đổi: hai đề-xi-mét bằng hai mươi xăng-ti-mét. Giỏi lắm, mình sang kiểm tra nào!","h":"<div class='stepcard'><div class='n'>=</div><div>2 dm = <b>20 cm</b></div></div>"}
+    ],
+    "8": [
+      {"a":"g2_l8_s1.mp3","n":"Chào con! Hôm nay mình học xem đồng hồ. Đồng hồ có hai kim: kim ngắn và kim dài.","h":"<div class='hook'>🕒 Đồng hồ có <b>kim ngắn</b> và <b>kim dài</b>.</div>"},
+      {"a":"g2_l8_s2.mp3","n":"Bước đầu tiên, con nhớ: kim ngắn chỉ giờ, kim dài chỉ phút. Khi kim dài chỉ vào số mười hai thì đó là giờ đúng.","h":"<div class='exbox'><svg viewBox='0 0 100 100' width='100'><circle cx='50' cy='50' r='46' fill='#fff' stroke='#4f6ef7' stroke-width='3'/><line x1='50' y1='50' x2='50' y2='26' stroke='#111' stroke-width='4'/><line x1='50' y1='50' x2='72' y2='50' stroke='#dc2626' stroke-width='3'/><circle cx='50' cy='50' r='3' fill='#111'/><text x='50' y='18' font-size='9' text-anchor='middle'>12</text><text x='86' y='54' font-size='9' text-anchor='middle'>3</text><text x='50' y='93' font-size='9' text-anchor='middle'>6</text><text x='15' y='54' font-size='9' text-anchor='middle'>9</text></svg><div>kim ngắn: giờ · kim dài: phút</div></div>"},
+      {"a":"g2_l8_s3.mp3","n":"Tiếp theo, khi kim dài chỉ vào số sáu thì đó là giờ rưỡi, tức là ba mươi phút.","h":"<div class='keybox'><span class='lab'>💡 Nhớ</span>Kim dài chỉ 12 → giờ đúng · chỉ 6 → giờ rưỡi.</div>"},
+      {"a":"g2_l8_s4.mp3","n":"Con tập nhìn đồng hồ ở nhà mỗi ngày là quen ngay. Giỏi lắm, mình sang kiểm tra!","h":"<div class='tipbox'><span class='lab'>✨ Mẹo</span>Tập xem đồng hồ ở nhà mỗi ngày.</div>"}
+    ],
+    "9": [
+      {"a":"g2_l9_s1.mp3","n":"Chào con! Hôm nay mình học vài hình quen thuộc: hình tứ giác, đường thẳng và đường gấp khúc.","h":"<div class='hook'>📐 Hình tứ giác · đường thẳng · đường gấp khúc.</div>"},
+      {"a":"g2_l9_s2.mp3","n":"Bước đầu tiên, con nhìn hình tứ giác. Nó có bốn cạnh và bốn góc. Hình chữ nhật và hình vuông cũng là tứ giác.","h":"<div class='exbox'><svg viewBox='0 0 120 80' width='120'><polygon points='15,15 105,25 95,70 25,60' fill='#eef1ff' stroke='#4f6ef7' stroke-width='2'/></svg><div>tứ giác: 4 cạnh, 4 góc</div></div>"},
+      {"a":"g2_l9_s3.mp3","n":"Tiếp theo là đường gấp khúc. Đó là nhiều đoạn thẳng nối tiếp nhau, bẻ gấp ở các điểm. Khác với đường thẳng đi mãi không bẻ.","h":"<div class='exbox'><svg viewBox='0 0 140 60' width='140'><polyline points='10,50 40,15 75,45 110,10 130,40' fill='none' stroke='#d4537e' stroke-width='3'/></svg><div>đường gấp khúc</div></div>"},
+      {"a":"g2_l9_s4.mp3","n":"Cuối cùng con nhớ: đếm số cạnh để gọi tên hình; nhiều đoạn thẳng nối nhau là đường gấp khúc. Giỏi lắm, mình sang kiểm tra nào!","h":"<div class='keybox'><span class='lab'>💡 Nhớ</span>Đếm cạnh để gọi tên hình · nhiều đoạn nối nhau = đường gấp khúc.</div>"}
+    ]
   }
 }
