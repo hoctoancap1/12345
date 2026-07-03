@@ -1,0 +1,123 @@
+<!doctype html><html lang="vi"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Trượt khối gỗ · Unblock Me</title>
+<style>
+:root{--text-primary:#2e2418;--text-secondary:#7a6b52;--border-strong:#cdb488;--surface-2:#fffaf0;--font-sans:system-ui,'Segoe UI',Roboto,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font-sans);background:#efe6d5;color:var(--text-primary);padding:12px}
+.top{max-width:470px;margin:0 auto 10px;display:flex;align-items:center;gap:10px}
+.back{font-size:14px;color:#8a6d3a;text-decoration:none;font-weight:500;white-space:nowrap}
+.ttl{font-size:15px;font-weight:600}
+</style></head>
+<body>
+<div class="top"><a class="back" href="index.html">← Về trang học</a><span class="ttl">Trượt khối gỗ · Unblock Me</span></div>
+<div style="max-width:470px;margin:0 auto;font-family:var(--font-sans);">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+    <div style="font-size:15px;font-weight:500;color:var(--text-primary);">Màn <span id="uLv">1</span>/<span id="uTot">61</span> <span id="uDone" style="color:#3a9d5d;font-size:12px;font-weight:400;"></span></div>
+    <div style="font-size:13px;color:var(--text-secondary);">Số nước: <b id="uMv" style="color:var(--text-primary)">0</b> · tối thiểu <span id="uTg">–</span></div>
+  </div>
+  <div style="position:relative;">
+    <canvas id="ub" width="470" height="448" style="width:100%;display:block;border-radius:16px;touch-action:none;cursor:pointer;"></canvas>
+    <div id="uwin" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(40,26,12,0.78);border-radius:16px;color:#fff;text-align:center;">
+      <div style="font-size:26px;font-weight:500;">Qua màn! 🎉</div>
+      <div id="uwinfo" style="font-size:15px;color:#f0dcb8;"></div>
+      <button id="unext" style="margin-top:4px;padding:11px 28px;font-size:16px;font-weight:500;border:none;border-radius:10px;background:#e0a53c;color:#3a2606;cursor:pointer;">Màn tiếp →</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <button id="ureset" style="flex:1;padding:11px;font-size:15px;font-weight:500;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text-primary);cursor:pointer;">↺ Chơi lại</button>
+    <button id="uprev" style="padding:11px 16px;font-size:15px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text-primary);cursor:pointer;">‹ Trước</button>
+    <button id="unext2" style="padding:11px 16px;font-size:15px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text-primary);cursor:pointer;">Sau ›</button>
+  </div>
+</div>
+<script>
+(function(){
+  var BASE=[{"blocks":[[1,2,2,"h"],[2,4,2,"v"],[5,1,2,"v"],[5,3,2,"v"],[0,4,2,"v"],[0,1,2,"v"],[3,5,2,"h"],[1,3,3,"v"],[2,3,2,"h"],[1,0,2,"v"],[2,1,2,"h"],[4,1,2,"v"]],"moves":3},{"blocks":[[0,2,2,"h"],[3,1,2,"v"],[5,3,2,"v"],[0,0,2,"v"],[3,3,2,"v"],[4,5,2,"h"],[1,0,2,"v"],[0,4,3,"h"],[4,2,2,"v"],[0,3,3,"h"]],"moves":3},{"blocks":[[0,2,2,"h"],[1,5,2,"h"],[4,1,2,"v"],[0,4,3,"h"],[0,3,2,"h"],[3,1,3,"v"],[5,3,3,"v"],[0,0,2,"v"],[4,4,2,"v"],[1,1,2,"h"]],"moves":3},{"blocks":[[0,2,2,"h"],[5,3,3,"v"],[0,0,2,"v"],[4,3,3,"v"],[2,1,3,"h"],[3,2,3,"v"],[1,3,2,"v"],[0,3,2,"v"],[1,0,2,"h"],[2,2,2,"v"]],"moves":3},{"blocks":[[0,2,2,"h"],[5,3,3,"v"],[3,2,3,"v"],[0,5,2,"h"],[2,2,3,"v"],[1,0,2,"v"],[4,0,2,"v"],[0,3,2,"v"],[5,1,2,"v"],[3,0,2,"v"]],"moves":4},{"blocks":[[1,2,2,"h"],[4,2,2,"v"],[1,3,2,"v"],[0,1,3,"h"],[2,0,3,"h"],[5,3,2,"v"],[0,2,2,"v"],[5,0,2,"v"],[2,3,2,"h"],[2,5,2,"h"],[0,5,2,"h"],[3,1,2,"v"],[4,5,2,"h"]],"moves":4},{"blocks":[[0,2,2,"h"],[3,2,3,"v"],[4,2,2,"v"],[4,0,2,"h"],[5,3,3,"v"],[2,0,2,"v"],[1,3,2,"v"],[2,2,2,"v"],[4,1,2,"h"],[0,0,2,"h"]],"moves":4},{"blocks":[[1,2,2,"h"],[3,5,2,"h"],[4,2,2,"v"],[3,1,2,"v"],[4,0,2,"h"],[1,5,2,"h"],[0,1,3,"h"],[5,3,2,"v"],[4,1,2,"h"],[2,3,2,"h"],[0,2,2,"v"],[0,0,2,"h"],[2,0,2,"h"]],"moves":4},{"blocks":[[1,2,2,"h"],[3,3,3,"v"],[3,1,2,"v"],[3,0,2,"h"],[1,1,2,"h"],[4,3,2,"v"],[0,1,2,"v"],[4,1,2,"v"],[1,3,2,"v"],[0,5,2,"h"],[5,3,2,"v"],[5,0,2,"v"]],"moves":4},{"blocks":[[0,2,2,"h"],[5,0,2,"v"],[3,2,2,"v"],[5,2,3,"v"],[1,3,2,"h"],[2,4,2,"h"],[0,0,2,"v"],[1,5,2,"h"],[2,0,2,"h"],[4,5,2,"h"],[1,0,2,"v"]],"moves":5},{"blocks":[[1,2,2,"h"],[3,2,3,"v"],[4,0,2,"h"],[0,2,3,"v"],[1,3,3,"v"],[4,5,2,"h"],[2,1,2,"h"],[2,0,2,"h"],[4,3,2,"h"],[2,4,2,"v"],[4,4,2,"h"],[4,1,2,"v"]],"moves":5},{"blocks":[[0,2,2,"h"],[3,2,3,"v"],[4,3,3,"v"],[0,3,3,"h"],[1,5,2,"h"],[0,0,2,"v"],[4,1,2,"v"],[2,1,2,"h"],[5,1,3,"v"],[4,0,2,"h"]],"moves":5},{"blocks":[[0,2,2,"h"],[3,0,3,"h"],[3,4,3,"h"],[4,1,2,"v"],[2,2,3,"v"],[1,3,2,"v"],[5,2,2,"v"],[0,4,2,"v"],[0,1,2,"h"],[4,5,2,"h"]],"moves":5},{"blocks":[[0,2,2,"h"],[5,0,2,"v"],[1,4,3,"h"],[1,0,2,"h"],[3,1,2,"h"],[2,1,2,"v"],[0,3,3,"v"],[4,3,2,"h"],[0,0,2,"v"],[3,5,3,"h"],[3,2,2,"v"]],"moves":5},{"blocks":[[0,2,2,"h"],[4,1,2,"v"],[3,5,3,"h"],[4,3,2,"v"],[2,2,2,"v"],[1,0,2,"h"],[3,0,2,"h"],[0,5,2,"h"],[5,2,2,"v"],[1,3,2,"v"]],"moves":6},{"blocks":[[1,2,2,"h"],[5,2,2,"v"],[4,1,2,"v"],[2,1,2,"h"],[2,4,2,"h"],[1,3,2,"v"],[2,0,3,"h"],[2,5,2,"h"],[0,5,2,"h"],[4,4,2,"h"],[1,0,2,"v"],[3,3,2,"h"],[0,1,3,"v"]],"moves":6},{"blocks":[[0,2,2,"h"],[3,2,2,"v"],[2,0,2,"h"],[1,3,2,"v"],[5,3,2,"v"],[2,2,2,"v"],[0,0,2,"h"],[3,4,2,"h"],[1,5,2,"h"],[4,2,2,"v"]],"moves":6},{"blocks":[[1,2,2,"h"],[4,3,3,"v"],[3,4,2,"v"],[0,4,2,"v"],[2,0,3,"h"],[1,0,2,"v"],[5,2,2,"v"],[4,1,2,"v"],[0,1,2,"v"],[1,3,3,"h"],[2,4,2,"v"],[5,0,2,"v"],[1,4,2,"v"]],"moves":6},{"blocks":[[0,2,2,"h"],[1,0,2,"v"],[2,0,2,"h"],[2,1,2,"h"],[1,3,2,"v"],[1,5,3,"h"],[2,2,2,"v"],[3,4,3,"h"],[3,2,2,"v"],[5,0,2,"v"]],"moves":7},{"blocks":[[1,2,2,"h"],[2,1,2,"h"],[1,3,2,"v"],[3,3,3,"v"],[4,5,2,"h"],[5,2,2,"v"],[0,0,3,"v"],[4,1,2,"h"],[1,0,2,"v"],[0,3,3,"v"],[2,4,2,"v"],[2,0,2,"h"],[4,2,3,"v"]],"moves":7},{"blocks":[[0,2,2,"h"],[1,3,2,"v"],[4,1,2,"v"],[3,3,2,"v"],[2,0,2,"h"],[2,3,2,"v"],[5,2,3,"v"],[4,5,2,"h"],[4,0,2,"h"],[3,1,2,"v"],[1,5,3,"h"]],"moves":7},{"blocks":[[1,2,2,"h"],[1,0,2,"h"],[5,1,2,"v"],[0,1,3,"h"],[0,3,3,"v"],[3,4,2,"h"],[4,3,2,"h"],[4,5,2,"h"],[3,0,3,"v"],[4,0,2,"h"],[2,5,2,"h"],[4,1,2,"v"]],"moves":7},{"blocks":[[0,2,2,"h"],[1,4,2,"h"],[1,0,2,"v"],[5,0,2,"v"],[2,1,2,"v"],[3,4,2,"h"],[2,0,3,"h"],[3,3,2,"h"],[0,0,2,"v"],[4,1,2,"v"]],"moves":7},{"blocks":[[0,2,2,"h"],[2,2,2,"v"],[1,4,2,"h"],[1,0,2,"v"],[5,1,3,"v"],[4,0,3,"v"],[4,5,2,"h"],[3,1,2,"v"],[0,4,2,"v"],[0,3,2,"h"],[2,0,2,"h"]],"moves":7},{"blocks":[[1,2,2,"h"],[3,0,2,"h"],[0,1,2,"h"],[4,1,3,"v"],[0,3,2,"h"],[3,5,2,"h"],[1,4,2,"v"],[5,2,2,"v"],[2,4,2,"h"],[3,2,2,"v"],[0,4,2,"v"],[2,1,2,"h"],[0,0,2,"h"]],"moves":7},{"blocks":[[1,2,2,"h"],[4,3,3,"v"],[3,1,2,"h"],[5,3,3,"v"],[1,4,3,"h"],[3,2,2,"v"],[1,5,2,"h"],[0,4,2,"v"],[5,1,2,"v"],[4,0,2,"h"],[0,1,2,"v"],[2,0,2,"v"],[0,3,2,"h"]],"moves":8},{"blocks":[[1,2,2,"h"],[4,1,2,"v"],[0,0,2,"v"],[3,0,2,"h"],[3,4,2,"h"],[1,3,3,"h"],[3,1,2,"v"],[2,5,3,"h"],[0,2,2,"v"],[0,5,2,"h"],[5,0,2,"v"],[2,0,2,"v"],[5,4,2,"v"]],"moves":8},{"blocks":[[0,2,2,"h"],[3,0,3,"h"],[0,4,2,"h"],[3,2,2,"v"],[1,0,2,"v"],[0,0,2,"v"],[2,1,2,"h"],[2,4,2,"h"],[4,3,2,"v"],[1,5,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[0,3,2,"v"],[3,4,2,"v"],[5,1,3,"v"],[2,3,2,"h"],[1,5,2,"h"],[4,1,2,"v"],[4,5,2,"h"],[4,3,2,"v"],[2,1,2,"v"],[2,0,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[1,5,2,"h"],[4,1,2,"v"],[5,3,2,"v"],[0,3,3,"v"],[2,1,2,"h"],[3,3,3,"v"],[4,0,2,"h"],[4,4,2,"v"],[1,0,2,"v"],[2,2,3,"v"]],"moves":8},{"blocks":[[1,2,2,"h"],[1,4,3,"h"],[5,2,3,"v"],[2,1,2,"h"],[5,0,2,"v"],[1,5,2,"h"],[4,1,2,"v"],[0,0,2,"v"],[3,5,3,"h"],[0,2,3,"v"],[3,2,2,"v"],[3,0,2,"h"]],"moves":8},{"blocks":[[1,2,2,"h"],[1,5,2,"h"],[2,0,2,"h"],[4,5,2,"h"],[1,3,2,"h"],[2,4,2,"h"],[4,1,3,"v"],[0,4,2,"v"],[5,1,3,"v"],[0,1,2,"h"],[4,0,2,"h"],[3,2,2,"v"],[2,1,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[4,4,2,"h"],[2,2,2,"v"],[0,5,2,"h"],[2,0,2,"h"],[0,0,2,"h"],[0,1,2,"h"],[3,1,2,"v"],[3,3,2,"v"],[5,2,2,"v"],[4,5,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[0,4,2,"v"],[0,3,3,"h"],[3,5,3,"h"],[1,5,2,"h"],[0,1,2,"h"],[5,2,2,"v"],[3,4,2,"h"],[3,1,2,"v"],[2,0,3,"v"],[3,0,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[5,4,2,"v"],[3,4,2,"h"],[3,1,2,"v"],[3,0,3,"h"],[5,1,2,"v"],[2,4,2,"v"],[0,4,2,"v"],[4,3,2,"h"],[0,3,2,"h"],[0,0,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[2,0,2,"h"],[1,4,2,"v"],[5,2,2,"v"],[3,1,2,"v"],[4,0,2,"h"],[2,3,2,"v"],[0,3,2,"v"],[1,0,2,"v"],[4,3,3,"v"],[4,1,2,"v"]],"moves":8},{"blocks":[[1,2,2,"h"],[4,4,2,"v"],[5,2,2,"v"],[2,0,2,"v"],[4,1,2,"v"],[2,4,2,"h"],[0,4,2,"v"],[3,3,2,"h"],[5,4,2,"v"],[4,0,2,"h"],[3,1,2,"v"],[0,3,3,"h"],[1,5,2,"h"]],"moves":8},{"blocks":[[1,2,2,"h"],[0,0,2,"v"],[4,2,2,"v"],[2,0,2,"h"],[3,2,3,"v"],[4,4,2,"v"],[1,1,2,"h"],[5,2,2,"v"],[4,1,2,"h"],[2,3,3,"v"],[1,3,3,"v"],[0,3,2,"v"]],"moves":8},{"blocks":[[0,2,2,"h"],[1,1,2,"h"],[4,3,2,"h"],[3,3,2,"v"],[2,3,2,"v"],[1,0,3,"h"],[5,0,3,"v"],[4,1,2,"v"],[4,5,2,"h"],[3,1,2,"v"]],"moves":8},{"blocks":[[1,2,2,"h"],[4,4,2,"h"],[5,1,3,"v"],[2,4,2,"h"],[4,5,2,"h"],[4,2,2,"v"],[1,0,2,"v"],[2,0,2,"v"],[4,0,2,"v"],[1,3,2,"v"],[0,1,3,"v"],[1,5,2,"h"]],"moves":8},{"blocks":[[0,2,2,"h"],[4,0,2,"v"],[0,4,2,"v"],[2,0,2,"h"],[3,5,2,"h"],[5,1,3,"v"],[4,4,2,"h"],[3,1,2,"v"],[0,0,2,"h"],[3,3,2,"v"]],"moves":9},{"blocks":[[1,2,2,"h"],[0,3,3,"h"],[4,5,2,"h"],[3,3,2,"v"],[0,4,2,"v"],[2,1,2,"h"],[4,1,3,"v"],[4,0,2,"h"],[1,5,2,"h"],[0,0,2,"h"],[0,1,2,"v"],[5,2,3,"v"],[1,4,2,"h"]],"moves":9},{"blocks":[[1,2,2,"h"],[3,0,2,"v"],[4,2,3,"v"],[0,0,2,"h"],[5,3,2,"v"],[2,4,2,"h"],[0,3,3,"v"],[1,5,2,"h"],[3,5,2,"h"],[5,1,2,"v"],[4,0,2,"h"],[1,3,2,"h"]],"moves":9},{"blocks":[[0,2,2,"h"],[3,3,2,"h"],[3,4,3,"h"],[4,0,3,"v"],[2,3,2,"v"],[5,2,2,"v"],[2,5,2,"h"],[0,3,2,"v"],[1,3,3,"v"],[4,5,2,"h"]],"moves":10},{"blocks":[[0,2,2,"h"],[0,0,2,"v"],[5,0,2,"v"],[2,3,2,"v"],[4,1,3,"v"],[1,4,2,"v"],[4,4,2,"h"],[1,1,3,"h"],[0,4,2,"v"],[3,5,3,"h"],[1,0,2,"h"]],"moves":10},{"blocks":[[0,2,2,"h"],[2,4,3,"h"],[5,0,2,"v"],[3,1,2,"h"],[1,0,2,"h"],[0,3,2,"v"],[1,4,2,"v"],[5,3,2,"v"],[4,2,2,"v"],[2,1,3,"v"],[2,5,2,"h"]],"moves":11},{"blocks":[[1,2,2,"h"],[5,2,2,"v"],[4,2,2,"v"],[4,4,2,"v"],[0,3,2,"v"],[0,5,2,"h"],[3,0,2,"h"],[1,0,2,"v"],[3,3,2,"v"],[2,0,2,"v"],[2,3,2,"v"],[4,1,2,"h"]],"moves":11},{"blocks":[[1,2,2,"h"],[3,3,2,"h"],[3,4,2,"h"],[0,0,2,"v"],[5,1,2,"v"],[3,1,2,"v"],[4,1,2,"v"],[4,5,2,"h"],[0,3,2,"h"],[1,0,3,"h"],[4,0,2,"h"],[5,3,2,"v"],[1,5,2,"h"]],"moves":13},{"blocks":[[0,2,2,"h"],[3,0,3,"v"],[2,4,2,"h"],[4,3,2,"h"],[0,4,2,"v"],[1,3,2,"v"],[4,0,3,"v"],[2,1,2,"v"],[5,4,2,"v"],[0,0,2,"v"],[3,5,2,"h"]],"moves":16},{"blocks":[[1,2,2,"h"],[4,0,3,"v"],[2,3,2,"v"],[3,4,3,"h"],[1,0,2,"v"],[1,4,2,"v"],[3,2,2,"v"],[5,1,2,"v"],[4,3,2,"h"],[2,0,2,"h"],[0,3,3,"v"],[0,1,2,"v"],[3,5,2,"h"]],"moves":16}];
+  var HARD=[{"blocks":[[2,2,2,"h"],[1,0,3,"h"],[5,0,3,"v"],[0,1,2,"h"],[4,1,2,"v"],[0,2,2,"v"],[1,2,2,"v"],[3,3,2,"v"],[0,4,2,"v"],[4,4,2,"h"],[1,5,2,"h"],[3,5,3,"h"]],"moves":13},{"blocks":[[0,2,2,"h"],[2,0,3,"v"],[3,0,3,"h"],[3,1,3,"v"],[4,1,2,"h"],[4,2,2,"v"],[5,2,2,"v"],[0,3,2,"v"],[1,3,2,"h"],[5,4,2,"v"],[0,5,2,"h"]],"moves":13},{"blocks":[[1,2,2,"h"],[1,0,2,"h"],[3,0,2,"h"],[5,0,2,"v"],[0,1,2,"h"],[2,1,2,"h"],[4,1,3,"v"],[2,3,2,"v"],[3,3,2,"v"],[0,4,2,"h"],[4,4,2,"h"],[1,5,2,"h"],[3,5,2,"h"]],"moves":14},{"blocks":[[2,2,2,"h"],[0,0,3,"v"],[2,0,2,"v"],[3,0,3,"h"],[1,1,3,"v"],[4,1,2,"v"],[5,1,2,"v"],[0,3,2,"v"],[2,3,2,"h"],[4,3,2,"h"],[5,4,2,"v"],[0,5,3,"h"],[3,5,2,"h"]],"moves":15},{"blocks":[[3,2,2,"h"],[2,0,2,"v"],[5,0,3,"v"],[0,1,3,"v"],[3,1,2,"h"],[2,2,3,"v"],[3,3,2,"v"],[0,4,2,"v"],[4,4,2,"h"],[1,5,2,"h"],[3,5,3,"h"]],"moves":15},{"blocks":[[3,2,2,"h"],[0,0,3,"v"],[1,0,2,"h"],[3,0,2,"h"],[5,0,3,"v"],[2,1,2,"v"],[0,3,2,"v"],[2,3,3,"v"],[3,3,2,"v"],[4,3,2,"h"],[3,5,3,"h"]],"moves":15},{"blocks":[[0,2,2,"h"],[0,0,2,"v"],[1,0,3,"h"],[4,0,2,"h"],[2,1,2,"v"],[3,1,2,"v"],[5,2,2,"v"],[0,3,2,"v"],[1,3,2,"h"],[3,3,2,"h"],[3,4,2,"v"],[0,5,3,"h"],[4,5,2,"h"]],"moves":20},{"blocks":[[2,2,2,"h"],[0,0,3,"v"],[1,0,2,"h"],[3,0,2,"h"],[1,1,2,"v"],[4,1,2,"v"],[0,3,2,"v"],[1,3,2,"v"],[3,3,2,"v"],[4,3,2,"h"],[4,4,2,"v"],[0,5,2,"h"],[2,5,2,"h"]],"moves":20},{"blocks":[[3,2,2,"h"],[0,0,2,"v"],[2,0,2,"h"],[4,0,2,"h"],[2,1,2,"v"],[5,1,3,"v"],[0,2,3,"v"],[1,3,2,"h"],[3,3,2,"h"],[3,4,2,"v"],[0,5,3,"h"],[4,5,2,"h"]],"moves":25},{"blocks":[[3,2,2,"h"],[0,0,3,"v"],[2,0,2,"h"],[4,0,2,"h"],[2,1,2,"v"],[5,1,3,"v"],[0,3,2,"v"],[2,3,2,"v"],[3,3,2,"h"],[3,4,2,"v"],[0,5,3,"h"],[4,5,2,"h"]],"moves":25},{"blocks":[[0,2,2,"h"],[0,0,3,"h"],[4,0,2,"v"],[5,0,2,"v"],[2,1,2,"v"],[5,2,3,"v"],[1,3,2,"v"],[2,3,2,"h"],[2,4,2,"v"],[0,5,2,"h"],[3,5,3,"h"]],"moves":30},{"blocks":[[1,2,2,"h"],[2,0,2,"v"],[3,0,2,"h"],[5,0,2,"v"],[0,1,3,"v"],[3,1,2,"v"],[5,2,3,"v"],[1,3,2,"h"],[3,3,2,"h"],[0,4,2,"h"],[2,4,2,"v"],[3,5,3,"h"]],"moves":35},{"blocks":[[0,2,2,"h"],[0,0,2,"v"],[2,0,3,"h"],[3,1,2,"v"],[4,1,3,"v"],[0,3,3,"h"],[3,3,2,"v"],[2,4,2,"v"],[4,4,2,"h"]],"moves":35},{"blocks":[[3,2,2,"h"],[0,0,3,"h"],[5,0,3,"v"],[2,1,2,"v"],[0,3,2,"h"],[2,3,2,"v"],[3,3,2,"v"],[4,3,2,"h"],[0,4,2,"v"],[4,4,2,"h"],[1,5,3,"h"]],"moves":36},{"blocks":[[3,2,2,"h"],[0,0,2,"h"],[2,0,3,"h"],[5,0,3,"v"],[0,1,2,"v"],[2,1,2,"v"],[0,3,2,"h"],[2,3,2,"h"],[4,3,2,"v"],[2,4,2,"v"],[3,4,2,"v"],[4,5,2,"h"]],"moves":40},{"blocks":[[1,2,2,"h"],[2,0,2,"v"],[3,0,2,"h"],[0,1,2,"h"],[3,1,2,"v"],[4,1,2,"v"],[0,2,2,"v"],[1,3,2,"h"],[3,3,2,"h"],[0,4,3,"h"],[3,4,2,"v"],[0,5,3,"h"]],"moves":40},{"blocks":[[0,2,2,"h"],[0,0,2,"v"],[1,0,2,"h"],[3,0,3,"v"],[4,0,2,"v"],[5,0,2,"v"],[2,1,2,"v"],[5,2,2,"v"],[0,3,2,"h"],[2,3,2,"h"],[2,4,2,"v"],[3,5,3,"h"]],"moves":45},{"blocks":[[0,2,2,"h"],[2,0,3,"v"],[3,0,2,"h"],[5,0,3,"v"],[3,1,2,"v"],[4,2,2,"v"],[0,3,2,"v"],[1,3,3,"h"],[1,4,2,"h"],[3,4,2,"v"],[0,5,2,"h"],[4,5,2,"h"]],"moves":45},{"blocks":[[0,2,2,"h"],[2,0,2,"v"],[3,0,3,"h"],[3,1,2,"v"],[2,2,2,"v"],[5,2,3,"v"],[0,3,2,"h"],[3,3,2,"h"],[0,4,2,"v"],[1,4,2,"v"],[2,4,2,"h"],[2,5,2,"h"]],"moves":50},{"blocks":[[3,2,2,"h"],[0,0,3,"v"],[1,0,2,"h"],[4,0,2,"v"],[1,1,2,"v"],[2,1,2,"v"],[5,1,3,"v"],[0,3,3,"h"],[3,3,2,"v"],[2,4,2,"v"],[4,4,2,"h"],[0,5,2,"h"],[3,5,2,"h"]],"moves":51}];
+  var LEVELS=BASE.filter(function(l){return l.moves>=5;}).concat(HARD);
+  LEVELS.sort(function(a,b){return a.moves-b.moves;});
+  var N=6, CS=68, OX=20, OY=20, EXITROW=2, SKEY='unblock_v3_done';
+  var cv=document.getElementById('ub'), ctx=cv.getContext('2d');
+  var lv=0, blocks=[], moves=0, drag=null, winAnim=0, solved=false, winExtra=0, autoT=null, done={};
+  var $=function(id){return document.getElementById(id)};
+  try{done=JSON.parse(localStorage.getItem(SKEY)||'{}')||{};}catch(e){done={};}
+  function saveDone(){try{localStorage.setItem(SKEY,JSON.stringify(done));}catch(e){}}
+  function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+  function doneCount(){var n=0;for(var i=0;i<LEVELS.length;i++)if(done[i])n++;return n;}
+  function updHUD(){var n=doneCount();$('uDone').textContent=n>0?('· ✓ '+n+'/'+LEVELS.length):'';}
+  $('uTot').textContent=LEVELS.length;
+  function load(i){if(autoT){clearTimeout(autoT);autoT=null;}lv=(i+LEVELS.length)%LEVELS.length;
+    blocks=LEVELS[lv].blocks.map(function(b,idx){return {x:b[0],y:b[1],len:b[2],o:b[3],main:idx===0,fx:b[0],fy:b[1]};});
+    moves=0;drag=null;winAnim=0;solved=false;winExtra=0;
+    $('uLv').textContent=(lv+1)+(done[lv]?' ✓':'');$('uTg').textContent=LEVELS[lv].moves+' nước';$('uMv').textContent='0';
+    $('uwin').style.display='none';cv.style.cursor='pointer';updHUD();}
+  function occExcept(skip){var s={};for(var i=0;i<blocks.length;i++){if(i===skip)continue;var b=blocks[i];for(var k=0;k<b.len;k++){var cx=b.o==='h'?b.x+k:b.x,cy=b.o==='h'?b.y:b.y+k;s[cx+','+cy]=1;}}return s;}
+  function pcell(e){var r=cv.getBoundingClientRect();var mx=(e.clientX-r.left)*(cv.width/r.width),my=(e.clientY-r.top)*(cv.height/r.height);
+    return {mx:mx,my:my,cx:Math.floor((mx-OX)/CS),cy:Math.floor((my-OY)/CS)};}
+  function down(e){if(solved)return;var p=pcell(e);
+    for(var i=0;i<blocks.length;i++){var b=blocks[i];var hit=false;
+      for(var k=0;k<b.len;k++){var cx=b.o==='h'?b.x+k:b.x,cy=b.o==='h'?b.y:b.y+k;if(cx===p.cx&&cy===p.cy){hit=true;break;}}
+      if(hit){var oc=occExcept(i);var mn,mx;
+        if(b.o==='h'){mn=b.x;while(mn-1>=0&&!oc[(mn-1)+','+b.y])mn--;mx=b.x;while(mx+b.len<N&&!oc[(mx+b.len)+','+b.y])mx++;}
+        else{mn=b.y;while(mn-1>=0&&!oc[b.x+','+(mn-1)])mn--;mx=b.y;while(mx+b.len<N&&!oc[b.x+','+(mx+b.len)])mx++;}
+        drag={i:i,startMouse:b.o==='h'?p.mx:p.my,start:b.o==='h'?b.x:b.y,mn:mn,mx:mx};e.preventDefault();return;}
+    }}
+  function move(e){if(!drag)return;var p=pcell(e);var b=blocks[drag.i];
+    var d=((b.o==='h'?p.mx:p.my)-drag.startMouse)/CS;var np=Math.max(drag.mn,Math.min(drag.mx,drag.start+d));
+    if(b.o==='h')b.fx=np;else b.fy=np;e.preventDefault();}
+  function up(e){if(!drag)return;var b=blocks[drag.i];
+    if(b.o==='h'){var nx=Math.round(b.fx);if(nx!==b.x){b.x=nx;moves++;}b.fx=b.x;}else{var ny=Math.round(b.fy);if(ny!==b.y){b.y=ny;moves++;}b.fy=b.y;}
+    $('uMv').textContent=moves;drag=null;if(b.main&&b.x+b.len===N){solved=true;winAnim=1;}}
+  cv.addEventListener('pointerdown',down,{passive:false});window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',up);
+
+  function stud(cx,cy,sr,main){var g=ctx.createRadialGradient(cx-sr*0.35,cy-sr*0.35,1,cx,cy,sr);
+    if(main){g.addColorStop(0,'#ff9f8b');g.addColorStop(0.7,'#d94a34');g.addColorStop(1,'#a82e1b');}else{g.addColorStop(0,'#f6dca8');g.addColorStop(0.7,'#c79553');g.addColorStop(1,'#8f6329');}
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,sr,0,6.28);ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.22)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.55)';ctx.beginPath();ctx.arc(cx-sr*0.32,cy-sr*0.32,sr*0.3,0,6.28);ctx.fill();}
+  function woodBlock(x,y,w,h,main,lift){
+    ctx.save();ctx.shadowColor='rgba(20,10,0,'+(lift?0.5:0.34)+')';ctx.shadowBlur=lift?18:10;ctx.shadowOffsetY=lift?8:4;
+    var g=ctx.createLinearGradient(x,y,x,y+h);
+    if(main){g.addColorStop(0,'#f2705a');g.addColorStop(0.5,'#df4e38');g.addColorStop(1,'#b3311d');}else{g.addColorStop(0,'#e6ba76');g.addColorStop(0.5,'#cf9a52');g.addColorStop(1,'#a5732f');}
+    ctx.fillStyle=g;rr(x,y,w,h,12);ctx.fill();ctx.restore();
+    var gl=ctx.createLinearGradient(x,y,x,y+h*0.55);gl.addColorStop(0,'rgba(255,255,255,0.30)');gl.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=gl;rr(x+4,y+4,w-8,h*0.5,9);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1.5;rr(x+1.5,y+1.5,w-3,h-3,11);ctx.stroke();ctx.strokeStyle='rgba(0,0,0,0.32)';ctx.lineWidth=1.5;rr(x,y,w,h,12);ctx.stroke();
+    var segs=w>h?Math.round(w/CS):Math.round(h/CS);
+    if(w>h){for(var i=1;i<segs;i++){var sx=x+i*(w/segs);ctx.strokeStyle='rgba(0,0,0,0.30)';ctx.beginPath();ctx.moveTo(sx,y+8);ctx.lineTo(sx,y+h-8);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,0.20)';ctx.beginPath();ctx.moveTo(sx+1.2,y+8);ctx.lineTo(sx+1.2,y+h-8);ctx.stroke();}}
+    else{for(var i=1;i<segs;i++){var sy=y+i*(h/segs);ctx.strokeStyle='rgba(0,0,0,0.30)';ctx.beginPath();ctx.moveTo(x+8,sy);ctx.lineTo(x+w-8,sy);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,0.20)';ctx.beginPath();ctx.moveTo(x+8,sy+1.2);ctx.lineTo(x+w-8,sy+1.2);ctx.stroke();}}
+    var sr=Math.min(w,h)*0.17;
+    for(var i=0;i<segs;i++){var cx=w>h?x+(i+0.5)*(w/segs):x+w/2, cy=w>h?y+h/2:y+(i+0.5)*(h/segs);if(main&&i===segs-1&&w>h)continue;stud(cx,cy,sr,main);}
+    if(main){var cxp=x+w-16,cyp=y+h/2;ctx.fillStyle='rgba(255,242,238,0.96)';ctx.beginPath();ctx.moveTo(cxp-7,cyp-9);ctx.lineTo(cxp+8,cyp);ctx.lineTo(cxp-7,cyp+9);ctx.closePath();ctx.fill();}}
+  function draw(){
+    var bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#241a10');bg.addColorStop(1,'#140d06');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);
+    var ay=OY+EXITROW*CS+CS/2, ex=OX+N*CS;
+    var eg=ctx.createRadialGradient(ex+14,ay,2,ex+14,ay,40);eg.addColorStop(0,'rgba(255,220,140,0.5)');eg.addColorStop(1,'rgba(255,220,140,0)');ctx.fillStyle=eg;ctx.fillRect(ex-10,ay-40,80,80);
+    var fx=OX-15,fy=OY-15,fw=N*CS+30,fh=N*CS+30;
+    var fg=ctx.createLinearGradient(fx,fy,fx,fy+fh);fg.addColorStop(0,'#7a5327');fg.addColorStop(0.5,'#5e3f1c');fg.addColorStop(1,'#432c12');
+    ctx.fillStyle=fg;rr(fx,fy,fw,fh,18);ctx.fill();ctx.strokeStyle='rgba(255,220,160,0.18)';ctx.lineWidth=2;rr(fx+1.5,fy+1.5,fw-3,fh-3,16);ctx.stroke();ctx.strokeStyle='rgba(0,0,0,0.5)';ctx.lineWidth=2;rr(fx,fy,fw,fh,18);ctx.stroke();
+    ctx.save();rr(OX-3,OY-3,N*CS+6,N*CS+6,10);ctx.clip();var ig=ctx.createLinearGradient(0,OY,0,OY+N*CS);ig.addColorStop(0,'#3b2a15');ig.addColorStop(1,'#2c1f0f');ctx.fillStyle=ig;ctx.fillRect(OX-3,OY-3,N*CS+6,N*CS+6);ctx.restore();
+    for(var r=0;r<N;r++)for(var c=0;c<N;c++){var x=OX+c*CS,y=OY+r*CS;rr(x+3,y+3,CS-6,CS-6,7);var cg=ctx.createLinearGradient(x,y,x,y+CS);cg.addColorStop(0,'#33240f');cg.addColorStop(1,'#4a3418');ctx.fillStyle=cg;ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.35)';ctx.lineWidth=1.2;rr(x+3,y+3,CS-6,CS-6,7);ctx.stroke();ctx.strokeStyle='rgba(255,220,160,0.06)';rr(x+4.5,y+4.5,CS-9,CS-9,6);ctx.stroke();}
+    ctx.fillStyle=fg;ctx.fillRect(ex+2,OY+EXITROW*CS+7,16,CS-14);
+    var bolts=[[fx+13,fy+13],[fx+fw-13,fy+13],[fx+13,fy+fh-13],[fx+fw-13,fy+fh-13]];
+    for(var i=0;i<4;i++){var bx=bolts[i][0],by=bolts[i][1];var mg=ctx.createRadialGradient(bx-2,by-2,1,bx,by,7);mg.addColorStop(0,'#e8e2d0');mg.addColorStop(1,'#8a8270');ctx.fillStyle=mg;ctx.beginPath();ctx.arc(bx,by,6,0,6.28);ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;ctx.stroke();ctx.strokeStyle='rgba(60,50,40,0.7)';ctx.beginPath();ctx.moveTo(bx-3,by);ctx.lineTo(bx+3,by);ctx.stroke();}
+    var pulse=0.55+0.45*Math.sin(Date.now()/380);
+    ctx.fillStyle='rgba(255,216,138,'+pulse+')';ctx.beginPath();ctx.moveTo(ex+22,ay-9);ctx.lineTo(ex+36,ay);ctx.lineTo(ex+22,ay+9);ctx.closePath();ctx.fill();
+    ctx.globalAlpha=pulse*0.6;ctx.beginPath();ctx.moveTo(ex+34,ay-9);ctx.lineTo(ex+48,ay);ctx.lineTo(ex+34,ay+9);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+    for(var i=0;i<blocks.length;i++){var b=blocks[i];var isDrag=(drag&&drag.i===i);var bx=isDrag?b.fx:b.x, by=isDrag?b.fy:b.y;if(isDrag){if(b.o==='h')by=b.y;else bx=b.x;}
+      if(b.main&&winAnim>0)bx=bx+winExtra;var px=OX+bx*CS, py=OY+by*CS, w=b.o==='h'?b.len*CS:CS, h=b.o==='v'?b.len*CS:CS;woodBlock(px+4,py+4,w-8,h-8,b.main,isDrag);}
+  }
+  function loop(){
+    if(solved&&winAnim>0){winExtra+=0.14;if(winExtra>3.2){winAnim=0;
+      if(!done[lv]){done[lv]=1;saveDone();}updHUD();
+      var opt=moves<=LEVELS[lv].moves;
+      $('uwinfo').textContent='Xong bằng '+moves+' nước'+(opt?' — tối ưu! ⭐':' (tối thiểu '+LEVELS[lv].moves+')');
+      $('uwin').style.display='flex';cv.style.cursor='default';
+      autoT=setTimeout(function(){autoT=null;load(lv+1);},1700);}}
+    draw();requestAnimationFrame(loop);}
+  $('ureset').onclick=function(){load(lv);};$('uprev').onclick=function(){load(lv-1);};$('unext2').onclick=function(){load(lv+1);};$('unext').onclick=function(){load(lv+1);};
+  var startIdx=0;for(var i=0;i<LEVELS.length;i++){if(!done[i]){startIdx=i;break;}}
+  load(startIdx);requestAnimationFrame(loop);
+})();
+</script>
+</body></html>

@@ -1,8 +1,9 @@
 /* Service worker cho Gia Sư AI (PWA) */
-const VERSION = 'gsai-v5';
+const VERSION = 'gsai-v6';
 const CORE = [
   './',
   'index.html',
+  'unblock.html',
   'steps.json',
   'curriculum_g2.json',
   'curriculum_g3.json',
