@@ -283,6 +283,7 @@ try{
     <button class="nav-btn" data-view="grade"><span class="ic">✅</span> Chấm bài nhanh</button>
     <button class="nav-btn" data-view="progress"><span class="ic">🏆</span> Thành tích</button>
     <button class="nav-btn" data-view="game"><span class="ic">🎮</span> Trò chơi</button>
+    <button class="nav-btn" data-view="iqtest"><span class="ic">🧠</span> Test IQ</button>
     <div class="nav-spacer"></div>
     <button class="nav-btn" data-view="settings"><span class="ic">⚙️</span> Cài đặt</button>
   </aside>
@@ -323,6 +324,8 @@ try{
           <iframe id="gameFrame" title="Trò chơi trượt khối gỗ" data-src="unblock.html" scrolling="no" style="width:100%;height:520px;border:0;border-radius:14px;background:#140d06;margin-top:10px"></iframe>
         </div>
       </section>
+
+      <section class="view" id="view-iqtest"></section>
 
       <section class="view" id="view-settings">
         <div class="card" id="accountCard">
@@ -1833,7 +1836,7 @@ function testVoice(){
 function autoSpeakLearn(){setTimeout(function(){const b=document.getElementById('speakBtn');if(b&&!isSpeaking())startLesson(b)},400)}
 
 /* ===== NAV ===== */
-const TITLES={curriculum:'Lộ trình Toán',lesson:'Bài học',grade:'Chấm bài nhanh',progress:'Thành tích',game:'Trò chơi',settings:'Cài đặt'};
+const TITLES={curriculum:'Lộ trình Toán',lesson:'Bài học',grade:'Chấm bài nhanh',progress:'Thành tích',game:'Trò chơi',iqtest:'Test IQ',settings:'Cài đặt'};
 const navBtns=document.querySelectorAll('.nav-btn');
 function showView(v){
   stopSpeak();
@@ -1847,6 +1850,7 @@ function showView(v){
   if(v==='progress')renderProgress();
   if(v==='settings')fillSettings();
   if(v==='game'){var gf=document.getElementById('gameFrame');if(gf&&!gf.src&&gf.dataset.src)gf.src=gf.dataset.src;}
+  if(v==='iqtest'&&window.IQ)window.IQ.mount();
 }
 navBtns.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 window.addEventListener('message',function(e){if(e&&e.data&&e.data.unblockH){var gf=document.getElementById('gameFrame');if(gf)gf.style.height=Math.max(380,Math.round(e.data.unblockH)+4)+'px';}});
@@ -2389,6 +2393,321 @@ authInit();
     if(n)setTimeout(refreshUI,50);
   });
   window.addEventListener('load',refreshUI);
+})();
+</script>
+
+<!-- ============ TEST IQ (ma trận hình học kiểu testiq.vn) ============ -->
+<style>
+  #view-iqtest .iq-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  #view-iqtest .iq-qno{font-weight:800;font-size:16px}
+  #view-iqtest .iq-time{font-weight:800;color:var(--red)}
+  #view-iqtest .iq-time .lbl{color:var(--ink);font-weight:600;margin-right:6px}
+  #view-iqtest .iq-prog{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 18px}
+  #view-iqtest .iq-prog>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),#8b5cf6);transition:width .3s}
+  #view-iqtest .iq-stage{display:flex;gap:22px;align-items:stretch;flex-wrap:wrap}
+  #view-iqtest .iq-board{flex:1 1 300px;min-width:280px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px;display:flex;align-items:center;justify-content:center}
+  #view-iqtest .iq-board svg{width:100%;max-width:360px;height:auto}
+  #view-iqtest .iq-opts{flex:1 1 300px;min-width:280px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-content:start}
+  #view-iqtest .iq-opt{border:2px solid var(--line);border-radius:12px;background:#fff;padding:10px;display:grid;place-items:center;transition:.12s;min-height:96px}
+  #view-iqtest .iq-opt svg{width:100%;max-width:88px;height:auto}
+  #view-iqtest .iq-opt:hover{border-color:var(--brand)}
+  #view-iqtest .iq-opt.sel{border-color:var(--brand);background:var(--brand-soft);box-shadow:0 0 0 3px var(--brand-soft)}
+  #view-iqtest .iq-pad{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+  #view-iqtest .iq-pn{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:700;color:var(--muted);font-size:13px}
+  #view-iqtest .iq-pn.cur{background:var(--brand);color:#fff;border-color:var(--brand)}
+  #view-iqtest .iq-pn.done{background:var(--brand-soft);color:var(--brand-dark);border-color:#c9d4ff}
+  #view-iqtest .iq-nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+  #view-iqtest .iq-res-num{font-size:52px;font-weight:800;line-height:1;color:var(--brand-dark)}
+  #view-iqtest .iq-iq{font-size:34px;font-weight:800;margin:6px 0}
+  #view-iqtest .iq-rev{border-top:1px solid var(--line);padding:14px 0;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  #view-iqtest .iq-rev svg{width:70px;height:70px;border:1px solid var(--line);border-radius:8px;background:#fff;flex:0 0 auto}
+  #view-iqtest .iq-badge{font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px}
+  #view-iqtest .iq-badge.ok{background:var(--green-soft);color:var(--green)}
+  #view-iqtest .iq-badge.no{background:#fdecec;color:var(--red)}
+  @media(max-width:560px){#view-iqtest .iq-opts{grid-template-columns:repeat(3,1fr);gap:8px}#view-iqtest .iq-opt{min-height:74px;padding:6px}}
+  #view-iqtest .iq-qimg{width:100%;max-width:780px;height:auto;display:block;margin:0 auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  #view-iqtest .iq-noimg{padding:60px 10px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+  #view-iqtest .iq-opts.letters{grid-template-columns:repeat(6,1fr);max-width:540px;margin:0 auto}
+  #view-iqtest .iq-letter{font-size:20px;font-weight:800;padding:14px 0;min-height:0;color:var(--ink)}
+  #view-iqtest .iq-letter.sel{color:var(--brand-dark)}
+  #view-iqtest .iq-badge.na{background:#eef0f5;color:var(--lock)}
+  #view-iqtest .iq-revimg{width:210px;max-width:42%;height:auto;border:1px solid var(--line);border-radius:8px}
+</style>
+<script>
+(function(){
+  const TC='#2f8fb0';                 // màu nét/tô teal kiểu testiq
+  const NS='http://www.w3.org/2000/svg';
+  const SW=3.2;
+  function wrap(inner){return `<svg viewBox="0 0 100 100" xmlns="${NS}">${inner}</svg>`;}
+  // ---- hình cơ bản (trong ô 100x100) ----
+  function circle(f,r){r=r||30;return `<circle cx="50" cy="50" r="${r}" fill="${f}" stroke="${TC}" stroke-width="${SW}"/>`;}
+  function square(f,h){h=h||28;return `<rect x="${50-h}" y="${50-h}" width="${2*h}" height="${2*h}" fill="${f}" stroke="${TC}" stroke-width="${SW}"/>`;}
+  function triangle(f){return `<polygon points="50,20 78,74 22,74" fill="${f}" stroke="${TC}" stroke-width="${SW}" stroke-linejoin="round"/>`;}
+  function diamond(f){return `<polygon points="50,16 84,50 50,84 16,50" fill="${f}" stroke="${TC}" stroke-width="${SW}" stroke-linejoin="round"/>`;}
+  function ngon(n,f,rot,r){r=r||32;let p=[];for(let i=0;i<n;i++){const a=(-90+(rot||0)+i*360/n)*Math.PI/180;p.push((50+r*Math.cos(a)).toFixed(1)+','+(50+r*Math.sin(a)).toFixed(1));}return `<polygon points="${p.join(' ')}" fill="${f}" stroke="${TC}" stroke-width="${SW}" stroke-linejoin="round"/>`;}
+  function pentagon(f){return ngon(5,f,0);}
+  function hexagon(f){return ngon(6,f,0,34);}
+  function star(n,f,rot){const ri=n>=6?17:(n===5?14:11);let p=[];for(let i=0;i<2*n;i++){const r=i%2?ri:33;const a=(-90+(rot||0)+i*180/n)*Math.PI/180;p.push((50+r*Math.cos(a)).toFixed(1)+','+(50+r*Math.sin(a)).toFixed(1));}return `<polygon points="${p.join(' ')}" fill="${f}" stroke="${TC}" stroke-width="3" stroke-linejoin="round"/>`;}
+  function plus(){return `<line x1="50" y1="24" x2="50" y2="76" stroke="${TC}" stroke-width="${SW}"/><line x1="24" y1="50" x2="76" y2="50" stroke="${TC}" stroke-width="${SW}"/>`;}
+  function xcross(){return `<line x1="24" y1="24" x2="76" y2="76" stroke="${TC}" stroke-width="${SW}"/><line x1="76" y1="24" x2="24" y2="76" stroke="${TC}" stroke-width="${SW}"/>`;}
+  function qmark(){return `<text x="50" y="66" font-size="44" fill="${TC}" text-anchor="middle" font-weight="bold">?</text>`;}
+  // hình lồng: khung rỗng + hình nhỏ đặc bên trong
+  function inset(name){const big={square:square('none',28),circle:circle('none',30),pentagon:pentagon('none'),triangle:triangle('none')}[name];const small={square:square(TC,12),circle:circle(TC,13),pentagon:ngon(5,TC,0,14),triangle:`<polygon points="50,38 63,63 37,63" fill="${TC}"/>`}[name];return big+small;}
+  // hình đặc trong khung vuông (Q8)
+  function framed(inner){return square('none',34)+inner;}
+  // khối tô ở góc khung vuông (Q4)
+  function cornerBlock(pos){const fr=square('none',30);const s=18;const map={TL:[20,20],TR:[62,20],BR:[62,62],BL:[20,62],C:[41,41]};if(pos==='none')return fr;const m=map[pos];return fr+`<rect x="${m[0]}" y="${m[1]}" width="${s}" height="${s}" fill="${TC}"/>`;}
+  // nhóm n hình vuông nhỏ (Q3)
+  function sqGroup(n){const sz=18,gap=6,per=3;const rows=Math.ceil(n/per);let g='';let i=0;for(let r=0;r<rows;r++){const inRow=Math.min(per,n-r*per);const totW=inRow*sz+(inRow-1)*gap;const x0=50-totW/2;const totH=rows*sz+(rows-1)*gap;const y0=50-totH/2;for(let c=0;c<inRow;c++){const x=x0+c*(sz+gap),y=y0+r*(sz+gap);g+=`<rect x="${x}" y="${y}" width="${sz}" height="${sz}" fill="none" stroke="${TC}" stroke-width="2.6"/>`;i++;}}return g;}
+  // lưới nhỏ 3x3 với chấm (Q9,Q15)
+  function mini(cells){const o=18,s=(82-o)/3;let g='';for(let i=0;i<=3;i++){const p=o+i*s;g+=`<line x1="${o}" y1="${p.toFixed(1)}" x2="82" y2="${p.toFixed(1)}" stroke="${TC}" stroke-width="1.8"/><line x1="${p.toFixed(1)}" y1="${o}" x2="${p.toFixed(1)}" y2="82" stroke="${TC}" stroke-width="1.8"/>`;}cells.forEach((v,i)=>{if(!v)return;const r=Math.floor(i/3),c=i%3,cx=(o+s*c+s/2).toFixed(1),cy=(o+s*r+s/2).toFixed(1);if(v==='f')g+=`<circle cx="${cx}" cy="${cy}" r="5" fill="${TC}"/>`;else g+=`<circle cx="${cx}" cy="${cy}" r="5" fill="none" stroke="${TC}" stroke-width="2"/>`;});return g;}
+  // vuông + X + chấm ở 1 phía (Q10)
+  function sqXdot(q){const base=`<rect x="20" y="20" width="60" height="60" fill="none" stroke="${TC}" stroke-width="${SW}"/><line x1="20" y1="20" x2="80" y2="80" stroke="${TC}" stroke-width="2.2"/><line x1="80" y1="20" x2="20" y2="80" stroke="${TC}" stroke-width="2.2"/>`;const map={T:[50,31],R:[69,50],B:[50,69],L:[31,50],C:[50,50]};if(q==='none')return base;const m=map[q];return base+`<circle cx="${m[0]}" cy="${m[1]}" r="5.5" fill="${TC}"/>`;}
+  // lục giác 6 múi, tô 2 múi liền kề bắt đầu từ start (Q11)
+  function hexWedge(startOrFull){const cx=50,cy=50,r=34;const pts=[];for(let i=0;i<6;i++){const a=(-90+i*60)*Math.PI/180;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}let g='';if(startOrFull==='full'){g+=`<polygon points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="${TC}" stroke="${TC}" stroke-width="2"/>`;return g;}const shaded={};if(startOrFull!=null){shaded[startOrFull%6]=1;shaded[(startOrFull+1)%6]=1;}for(let i=0;i<6;i++){const a=pts[i],b=pts[(i+1)%6];g+=`<polygon points="${cx},${cy} ${a[0].toFixed(1)},${a[1].toFixed(1)} ${b[0].toFixed(1)},${b[1].toFixed(1)}" fill="${shaded[i]?TC:'none'}" stroke="${TC}" stroke-width="1.8"/>`;}g+=`<polygon points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${TC}" stroke-width="2.4"/>`;return g;}
+  // vuông + số vạch tăng dần + khối góc dưới-trái (Q12)
+  function tallySq(n){const fr=`<rect x="20" y="20" width="60" height="60" fill="none" stroke="${TC}" stroke-width="${SW}"/>`;const block=`<rect x="20" y="62" width="18" height="18" fill="${TC}"/>`;let t='';for(let i=0;i<n;i++){const x=44+i*7;t+=`<line x1="${x}" y1="66" x2="${x}" y2="78" stroke="${TC}" stroke-width="2.4"/>`;}return fr+block+t;}
+  // sao có cán, xoay (Q13)
+  function starStem(rot){return `<g transform="rotate(${rot} 50 50)">${star(5,'none',0)}<line x1="50" y1="50" x2="50" y2="12" stroke="${TC}" stroke-width="3"/></g>`;}
+  // vuông + vạch chéo ở 1 góc (Q14)
+  function cornerDiag(pos){const fr=`<rect x="20" y="20" width="60" height="60" fill="none" stroke="${TC}" stroke-width="${SW}"/>`;const map={TL:'24,24 40,40',TR:'76,24 60,40',BR:'76,76 60,60',BL:'24,76 40,60',C:'40,50 60,50'};const seg=map[pos].split(' ');return fr+`<line x1="${seg[0].split(',')[0]}" y1="${seg[0].split(',')[1]}" x2="${seg[1].split(',')[0]}" y2="${seg[1].split(',')[1]}" stroke="${TC}" stroke-width="${SW}"/>`;}
+  function cornerCircle(pos){const fr=`<rect x="20" y="20" width="60" height="60" fill="none" stroke="${TC}" stroke-width="${SW}"/>`;const map={BL:[30,70]};const m=map[pos]||[30,70];return fr+`<circle cx="${m[0]}" cy="${m[1]}" r="7" fill="none" stroke="${TC}" stroke-width="2.6"/>`;}
+
+  // ---- bảng 3x3 (missing=vị trí có '?') ----
+  function board3(cells,miss){let s=`<svg viewBox="0 0 336 336" xmlns="${NS}"><rect x="1" y="1" width="334" height="334" rx="10" fill="#fff" stroke="#cfd9e2" stroke-width="2"/>`;for(let i=0;i<9;i++){const r=Math.floor(i/3),c=i%3,x=8+c*108,y=8+r*108;s+=`<g transform="translate(${x},${y}) scale(1.04)">${i===miss?qmark():cells[i]}</g>`;}return s+'</svg>';}
+  // ---- dãy ngang 3+? ----
+  function boardSeq(items){let s=`<svg viewBox="0 0 448 120" xmlns="${NS}"><rect x="1" y="1" width="446" height="118" rx="10" fill="#fff" stroke="#cfd9e2" stroke-width="2"/>`;for(let i=0;i<4;i++){const x=8+i*110;s+=`<g transform="translate(${x},10) scale(1.0)">${i<3?items[i]:qmark()}</g>`;}return s+'</svg>';}
+
+  // =================== 15 CÂU ===================
+  const Q=[];
+  // 1. cùng một hình tròn
+  Q.push({board:board3([circle('none'),circle('none'),circle('none'),circle('none'),circle('none'),circle('none'),circle('none'),circle('none'),''],8),
+    opts:[triangle('none'),star(5,'none'),square('none'),diamond('none'),square(TC),circle('none')],ans:5,
+    rule:'Cả 9 ô đều là hình tròn rỗng → ô thiếu cũng là hình tròn rỗng.'});
+  // 2. cả lưới là hình tròn rỗng → cụm còn thiếu cũng là hình tròn rỗng
+  Q.push({board:boardField(),
+    opts:[grp('square'),grp('star'),square('none',30),grp('triangle'),grp('circle'),grp('fsquare')],ans:4,
+    rule:'Toàn bộ lưới đều là hình tròn rỗng → cụm hình còn thiếu cũng là các hình tròn rỗng.'});
+  // 3. số hình vuông tăng dần 1,2,3,4
+  Q.push({board:boardSeq([sqGroup(1),sqGroup(2),sqGroup(3)]),
+    opts:[sqGroup(2),sqGroup(3),sqGroup(4),sqGroup(5),sqGroup(6),sqGroup(1)],ans:2,
+    rule:'Số hình vuông tăng 1 → 2 → 3 → 4.'});
+  // 4. khối tô chạy quanh 4 góc theo chiều kim đồng hồ
+  Q.push({board:board3([cornerBlock('TL'),cornerBlock('TR'),cornerBlock('BR'),cornerBlock('BL'),cornerBlock('TL'),cornerBlock('TR'),cornerBlock('BR'),cornerBlock('BL'),''],8),
+    opts:[cornerBlock('TR'),cornerBlock('BR'),cornerBlock('BL'),cornerBlock('C'),cornerBlock('none'),cornerBlock('TL')],ans:5,
+    rule:'Khối vuông nhỏ chạy quanh 4 góc TL→TR→BR→BL lặp lại; ô thứ 9 quay về góc trên-trái.'});
+  // 5. số cánh sao tăng theo cột 4,5,6
+  Q.push({board:board3([star(4,'none'),star(5,'none'),star(6,'none'),star(4,'none'),star(5,'none'),star(6,'none'),star(4,'none'),star(5,'none'),''],8),
+    opts:[star(5,'none'),triangle('none'),star(4,'none'),star(6,TC),star(6,'none'),star(7,'none')],ans:4,
+    rule:'Mỗi hàng số cánh sao tăng 4 → 5 → 6; ô thiếu là sao 6 cánh rỗng.'});
+  // 6. cột 3 = chồng cột 1 lên cột 2
+  Q.push({board:board3([plus(),diamond('none'),plus()+diamond('none'),xcross(),diamond('none'),xcross()+diamond('none'),xcross(),square('none'),''],8),
+    opts:[xcross()+square('none'),plus()+square('none'),xcross()+diamond('none'),xcross(),square('none'),plus()+diamond('none')],ans:0,
+    rule:'Cột 3 = hình cột 1 chồng lên hình cột 2; hàng cuối là X chồng lên hình vuông.'});
+  // 7. cột: rỗng / đặc / lồng nhỏ; mỗi hàng một hình
+  Q.push({board:board3([square('none'),square(TC),inset('square'),circle('none'),circle(TC),inset('circle'),pentagon('none'),pentagon(TC),''],8),
+    opts:[inset('square'),inset('circle'),pentagon(TC),pentagon('none'),inset('pentagon'),inset('triangle')],ans:4,
+    rule:'Cột 1 rỗng, cột 2 tô đặc, cột 3 rỗng lồng hình nhỏ đặc; hàng cuối là ngũ giác.'});
+  // 8. ô vuông latinh: mỗi hàng & cột đủ vuông/ngũ giác/tròn
+  Q.push({board:board3([framed(square(TC,14)),framed(ngon(5,TC,0,16)),framed(circle(TC,15)),framed(circle(TC,15)),framed(square(TC,14)),framed(ngon(5,TC,0,16)),framed(ngon(5,TC,0,16)),framed(circle(TC,15)),''],8),
+    opts:[framed(square(TC,14)),framed(ngon(5,TC,0,16)),framed(circle(TC,15)),square(TC,14),framed(triangle(TC)),framed(hexagon(TC))],ans:0,
+    rule:'Mỗi hàng và mỗi cột đều có đủ hình vuông, ngũ giác, hình tròn; ô thiếu là hình vuông.'});
+  // 9. chấm dịch qua từng ô lưới nhỏ theo thứ tự đọc
+  Q.push({board:board3([0,1,2,3,4,5,6,7].map(k=>{const a=Array(9).fill('');a[k]='f';return mini(a);}).concat(['']),8),
+    opts:[(a=>{a[0]='f';return mini(a);})(Array(9).fill('')),(a=>{a[1]='f';return mini(a);})(Array(9).fill('')),(a=>{a[8]='f';return mini(a);})(Array(9).fill('')),(a=>{a[4]='f';return mini(a);})(Array(9).fill('')),(a=>{a[6]='f';return mini(a);})(Array(9).fill('')),(a=>{a[2]='f';return mini(a);})(Array(9).fill(''))],ans:2,
+    rule:'Chấm dịch lần lượt qua từng ô của lưới nhỏ theo thứ tự đọc; ô thứ 9 chấm ở góc dưới-phải.'});
+  // 10. chấm trong vuông-X xoay theo chiều kim đồng hồ
+  Q.push({board:boardSeq([sqXdot('T'),sqXdot('R'),sqXdot('B')]),
+    opts:[sqXdot('T'),sqXdot('R'),sqXdot('B'),sqXdot('L'),sqXdot('C'),sqXdot('none')],ans:3,
+    rule:'Chấm trong hình vuông có X xoay theo chiều kim đồng hồ: trên → phải → dưới → trái.'});
+  // 11. 2 múi tô của lục giác quay theo chiều kim đồng hồ
+  Q.push({board:board3([0,1,2,3,4,5,6,7].map(k=>hexWedge(k%6)).concat(['']),8),
+    opts:[hexWedge(0),hexWedge(1),hexWedge(2),hexWedge(3),hexWedge(4),hexWedge('full')],ans:2,
+    rule:'Hai múi tô đậm của lục giác quay đều một bước theo chiều kim đồng hồ mỗi ô; ô thứ 9 tô múi 3–4.'});
+  // 12. số vạch tăng dần trong hình vuông
+  Q.push({board:boardSeq([tallySq(1),tallySq(2),tallySq(3)]),
+    opts:[tallySq(2),tallySq(3),tallySq(4),tallySq(5),tallySq(6),tallySq(1)],ans:2,
+    rule:'Số vạch trong hình vuông tăng 1 → 2 → 3 → 4; khối tô ở góc dưới-trái giữ nguyên.'});
+  // 14. vạch chéo trong vuông chuyển quanh các góc
+  Q.push({board:boardSeq([cornerDiag('TL'),cornerDiag('TR'),cornerDiag('BR')]),
+    opts:[cornerDiag('TL'),cornerDiag('TR'),cornerDiag('BR'),cornerDiag('BL'),cornerDiag('C'),cornerCircle('BL')],ans:3,
+    rule:'Vạch chéo nhỏ chuyển quanh 4 góc theo chiều kim đồng hồ TL→TR→BR→BL.'});
+  // 15. latinh mẫu chấm: mỗi hàng & cột đủ 3 mẫu
+  const P_A=(()=>{const a=Array(9).fill('');a[0]='f';a[8]='e';return mini(a);})();
+  const P_B=(()=>{const a=Array(9).fill('');a[2]='f';a[6]='e';return mini(a);})();
+  const P_C=(()=>{const a=Array(9).fill('');a[4]='f';a[0]='e';return mini(a);})();
+  const P_D=(()=>{const a=Array(9).fill('');a[8]='f';a[2]='e';return mini(a);})();
+  const P_E=(()=>{const a=Array(9).fill('');a[6]='f';a[4]='e';return mini(a);})();
+  const P_F=(()=>{const a=Array(9).fill('');a[1]='f';a[5]='e';return mini(a);})();
+  Q.push({board:board3([P_A,P_B,P_C,P_B,P_C,P_A,P_C,P_A,''],8),
+    opts:[P_A,P_B,P_C,P_D,P_E,P_F],ans:1,
+    rule:'Mỗi hàng và mỗi cột đều có đủ 3 mẫu chấm khác nhau (bảng latinh); ô thiếu là mẫu còn lại của hàng/cột.'});
+
+  // ===== helpers cho câu 16–25 (hàm khai báo được hoisted) =====
+  function sqTick(rot){return `<rect x="20" y="20" width="60" height="60" fill="none" stroke="${TC}" stroke-width="${SW}"/><g transform="rotate(${rot} 50 50)"><line x1="20" y1="50" x2="43" y2="50" stroke="${TC}" stroke-width="2.8"/><line x1="43" y1="50" x2="43" y2="31" stroke="${TC}" stroke-width="2.8"/></g>`;}
+  function sqTickDot(rot){return `<rect x="20" y="20" width="60" height="60" fill="none" stroke="${TC}" stroke-width="${SW}"/><g transform="rotate(${rot} 50 50)"><line x1="20" y1="50" x2="43" y2="50" stroke="${TC}" stroke-width="2.8"/><circle cx="43" cy="50" r="4.5" fill="${TC}"/></g>`;}
+  function mini2(a,b){const arr=Array(9).fill('');arr[a]='f';arr[b]='f';return mini(arr);}
+  function glyph(kind,cx,cy,s){s=s||6;if(kind==='tri')return `<polygon points="${cx},${cy-s} ${cx+s},${cy+s} ${cx-s},${cy+s}" fill="none" stroke="${TC}" stroke-width="1.6" stroke-linejoin="round"/>`;if(kind==='sq')return `<rect x="${cx-s}" y="${cy-s}" width="${2*s}" height="${2*s}" fill="none" stroke="${TC}" stroke-width="1.6"/>`;if(kind==='cir')return `<circle cx="${cx}" cy="${cy}" r="${s}" fill="none" stroke="${TC}" stroke-width="1.6"/>`;if(kind==='x')return `<line x1="${cx-s}" y1="${cy-s}" x2="${cx+s}" y2="${cy+s}" stroke="${TC}" stroke-width="1.6"/><line x1="${cx+s}" y1="${cy-s}" x2="${cx-s}" y2="${cy+s}" stroke="${TC}" stroke-width="1.6"/>`;return '';}
+  function symGrid(arr){let g=`<rect x="15" y="15" width="70" height="70" fill="none" stroke="${TC}" stroke-width="2.4"/>`;const o=27,s=16;for(let i=0;i<9;i++){const r=Math.floor(i/3),c=i%3;g+=glyph(arr[i],o+c*s,o+r*s,6);}return g;}
+  function rot9(base,k){const a=[];for(let i=0;i<9;i++)a[i]=base[(i+k)%9];return a;}
+  function sqXmark(pDot,pRing){const tp={T:[50,33],R:[67,50],B:[50,67],L:[33,50]};let g=`<rect x="18" y="18" width="64" height="64" fill="none" stroke="${TC}" stroke-width="${SW}"/><line x1="18" y1="18" x2="82" y2="82" stroke="${TC}" stroke-width="2.2"/><line x1="82" y1="18" x2="18" y2="82" stroke="${TC}" stroke-width="2.2"/>`;if(pDot)g+=`<circle cx="${tp[pDot][0]}" cy="${tp[pDot][1]}" r="5.5" fill="${TC}"/>`;if(pRing)g+=`<circle cx="${tp[pRing][0]}" cy="${tp[pRing][1]}" r="5.5" fill="none" stroke="${TC}" stroke-width="2.4"/>`;return g;}
+  function quin(n){const pos=[[50,50],[31,31],[69,31],[31,69],[69,69]];let g=square('none',30);for(let i=0;i<5;i++){g+=`<circle cx="${pos[i][0]}" cy="${pos[i][1]}" r="5.5" fill="${i<n?TC:'none'}" stroke="${TC}" stroke-width="2"/>`;}return g;}
+  function trap(rot){return `<g transform="rotate(${rot} 50 50)"><polygon points="36,40 64,40 58,60 42,60" fill="${TC}" stroke="${TC}" stroke-width="1"/></g>`;}
+  function bar3(c){let g='';for(let i=0;i<3;i++)g+=`<rect x="${22+i*19}" y="41" width="19" height="18" fill="${c[i]?TC:'none'}" stroke="${TC}" stroke-width="2.4"/>`;return g;}
+  function tealMotif(rot){return `<rect x="18" y="18" width="64" height="64" fill="${TC}"/><g transform="rotate(${rot} 50 50)"><polygon points="50,28 70,50 50,72 30,50" fill="none" stroke="#fff" stroke-width="3"/><rect x="24" y="24" width="16" height="16" fill="#fff"/></g>`;}
+  function circM(inner){return circle('none',33)+inner;}
+  function star4Small(cx,cy){const o=9,ii=3.4;const p=[];for(let k=0;k<8;k++){const rr=k%2?ii:o;const a=(-90+k*45)*Math.PI/180;p.push((cx+rr*Math.cos(a)).toFixed(1)+','+(cy+rr*Math.sin(a)).toFixed(1));}return `<polygon points="${p.join(' ')}" fill="none" stroke="${TC}" stroke-width="1.8" stroke-linejoin="round"/>`;}
+  function grp(kind){const xs=[30,50,70],ys=[38,62];let g='';for(let r=0;r<2;r++)for(let c=0;c<3;c++){const cx=xs[c],cy=ys[r];if(kind==='circle')g+=`<circle cx="${cx}" cy="${cy}" r="8" fill="none" stroke="${TC}" stroke-width="2.2"/>`;else if(kind==='fcircle')g+=`<circle cx="${cx}" cy="${cy}" r="8" fill="${TC}"/>`;else if(kind==='square')g+=`<rect x="${cx-8}" y="${cy-8}" width="16" height="16" fill="none" stroke="${TC}" stroke-width="2.2"/>`;else if(kind==='fsquare')g+=`<rect x="${cx-8}" y="${cy-8}" width="16" height="16" fill="${TC}"/>`;else if(kind==='triangle')g+=`<polygon points="${cx},${cy-9} ${cx+8},${cy+7} ${cx-8},${cy+7}" fill="none" stroke="${TC}" stroke-width="2.2" stroke-linejoin="round"/>`;else if(kind==='star')g+=star4Small(cx,cy);}return g;}
+  function boardField(){let f='';const cols=8,rows=8,x0=22,step=42,r=14;for(let rr=0;rr<rows;rr++)for(let cc=0;cc<cols;cc++){if(rr===rows-1&&cc===cols-1){f+=`<text x="${x0+cc*step}" y="${x0+rr*step+16}" font-size="46" fill="${TC}" text-anchor="middle" font-weight="bold">?</text>`;continue;}f+=`<circle cx="${x0+cc*step}" cy="${x0+rr*step}" r="${r}" fill="none" stroke="${TC}" stroke-width="2.6"/>`;}return `<svg viewBox="0 0 340 340" xmlns="${NS}"><rect x="1" y="1" width="338" height="338" rx="10" fill="#fff" stroke="#cfd9e2" stroke-width="2"/>${f}</svg>`;}
+
+  // 16. vạch góc trong hình vuông xoay 90°
+  Q.push({board:boardSeq([sqTick(0),sqTick(90),sqTick(180)]),
+    opts:[sqTick(0),sqTick(90),sqTick(180),sqTick(270),sqTickDot(0),sqTick(45)],ans:3,
+    rule:'Vạch hình chữ L trong hình vuông xoay 90° theo chiều kim đồng hồ mỗi bước; bước 4 quay xuống dưới (270°).'});
+  // 17. hai chấm dịch chuyển trong lưới nhỏ
+  Q.push({board:board3([0,1,2,3,4,5,6,7].map(k=>mini2(k%9,(k+4)%9)).concat(['']),8),
+    opts:[mini2(8,3),mini2(0,4),mini2(1,5),mini2(2,6),mini2(7,2),mini2(5,0)],ans:0,
+    rule:'Hai chấm cùng dịch đều một bước qua các ô của lưới nhỏ theo thứ tự đọc; ô thứ 9 chấm ở ô 9 và ô 4.'});
+  // 18. hoàn thiện hình theo từng bước (đường → dở → đủ)
+  {const vline=`<line x1="50" y1="26" x2="50" y2="74" stroke="${TC}" stroke-width="${SW}"/>`;
+   const threeSide=`<path d="M74,26 L26,26 L26,74 L74,74" fill="none" stroke="${TC}" stroke-width="${SW}"/>`;
+   const fsq=square('none',24);
+   const arcS=`<path d="M60,37 A15,15 0 1,0 60,63" fill="none" stroke="${TC}" stroke-width="${SW}"/>`;
+   const arcB=`<path d="M64,29 A23,23 0 1,0 64,71" fill="none" stroke="${TC}" stroke-width="${SW}"/>`;
+   const fci=circle('none',26);
+   const tri1=`<line x1="30" y1="74" x2="50" y2="28" stroke="${TC}" stroke-width="${SW}"/>`;
+   const tri2=`<line x1="30" y1="74" x2="50" y2="28" stroke="${TC}" stroke-width="${SW}"/><line x1="50" y1="28" x2="70" y2="74" stroke="${TC}" stroke-width="${SW}"/>`;
+   const ftri=triangle('none');
+   Q.push({board:board3([vline,threeSide,fsq,arcS,arcB,fci,tri1,tri2,''],8),
+     opts:[ftri,`<polygon points="30,50 70,30 70,70" fill="none" stroke="${TC}" stroke-width="${SW}" stroke-linejoin="round"/>`,triangle(TC),`<polygon points="50,38 62,64 38,64" fill="none" stroke="${TC}" stroke-width="${SW}" stroke-linejoin="round"/>`,tri2,`<polygon points="30,30 30,70 70,50" fill="none" stroke="${TC}" stroke-width="${SW}" stroke-linejoin="round"/>`],ans:0,
+     rule:'Mỗi hàng dựng dần một hình: nét → còn thiếu → hoàn chỉnh; hàng 1 là vuông, hàng 2 là tròn, hàng 3 là tam giác.'});}
+  // 19. số chấm tô đặc tăng dần theo hàng
+  Q.push({board:board3([quin(1),quin(2),quin(3),quin(1),quin(2),quin(3),quin(1),quin(2),''],8),
+    opts:[quin(3),quin(1),quin(2),quin(4),quin(5),quin(0)],ans:0,
+    rule:'Trong mỗi hàng, số chấm tô đặc tăng 1 → 2 → 3 (theo thứ tự tâm, rồi các góc).'});
+  // 20. lưới ký hiệu dịch một bước mỗi ô
+  {const S20=['tri','sq','cir','sq','x','tri','cir','sq','x'];
+   Q.push({board:boardSeq([symGrid(rot9(S20,0)),symGrid(rot9(S20,1)),symGrid(rot9(S20,2))]),
+     opts:[symGrid(rot9(S20,3)),symGrid(rot9(S20,1)),symGrid(rot9(S20,5)),symGrid(rot9(S20,4)),symGrid(rot9(S20,6)),symGrid(rot9(S20,2))],ans:0,
+     rule:'Toàn bộ lưới ký hiệu 3×3 dịch (xoay vòng) một bước sau mỗi ô; ô thiếu là bước dịch tiếp theo.'});}
+  // 21. mảnh hình xoay 90°
+  Q.push({board:boardSeq([trap(0),trap(90),trap(180)]),
+    opts:[trap(270),trap(90),trap(180),trap(45),trap(135),trap(0)],ans:0,
+    rule:'Mảnh hình thang xoay 90° theo chiều kim đồng hồ mỗi bước; bước 4 ở góc 270°.'});
+  // 22. chấm đặc và vòng tròn xoay quanh 4 tam giác của X
+  {const ord=['T','R','B','L'];
+   Q.push({board:board3([0,1,2,3,4,5,6,7].map(k=>sqXmark(ord[k%4],ord[(k+1)%4])).concat(['']),8),
+     opts:[sqXmark('T','R'),sqXmark('R','B'),sqXmark('B','L'),sqXmark('L','T'),sqXmark('T',null),sqXmark(null,null)],ans:0,
+     rule:'Chấm đặc và vòng tròn cùng xoay theo chiều kim đồng hồ quanh 4 tam giác do dấu X tạo ra.'});}
+  // 23. cột 3 = chồng nét cột 1 + cột 2, trong hình tròn
+  {const mV=`<line x1="50" y1="22" x2="50" y2="78" stroke="${TC}" stroke-width="2.8"/>`;
+   const mH=`<line x1="22" y1="50" x2="78" y2="50" stroke="${TC}" stroke-width="2.8"/>`;
+   const mD1=`<line x1="29" y1="29" x2="71" y2="71" stroke="${TC}" stroke-width="2.8"/>`;
+   const mD2=`<line x1="71" y1="29" x2="29" y2="71" stroke="${TC}" stroke-width="2.8"/>`;
+   Q.push({board:board3([circM(mV),circM(mH),circM(mV+mH),circM(mD1),circM(mD2),circM(mD1+mD2),circM(mH),circM(mV),''],8),
+     opts:[circM(mV+mH),circM(mD1+mD2),circle('none',33),circM(mV),circM(mH),circM(mV+mH+mD1+mD2)],ans:0,
+     rule:'Cột 3 = nét trong hình tròn cột 1 chồng lên cột 2; hàng cuối ngang + dọc = dấu cộng.'});}
+  // 24. ô tô chạy vòng trên thanh 3 ô
+  Q.push({board:boardSeq([bar3([1,0,0]),bar3([0,1,0]),bar3([0,0,1])]),
+    opts:[bar3([1,0,0]),bar3([0,1,0]),bar3([0,0,1]),bar3([1,1,0]),bar3([0,1,1]),bar3([1,0,1])],ans:0,
+    rule:'Ô tô đặc chạy trái → giữa → phải rồi lặp lại; bước 4 quay về ô trái.'});
+  // 25. khối trắng trong ô vuông tô xoay 90°
+  Q.push({board:boardSeq([tealMotif(0),tealMotif(90),tealMotif(180)]),
+    opts:[tealMotif(270),tealMotif(90),tealMotif(180),tealMotif(45),tealMotif(135),tealMotif(0)],ans:0,
+    rule:'Hình vuông trắng nhỏ (kèm hình thoi viền trắng) xoay 90° theo chiều kim đồng hồ mỗi bước.'});
+
+  // ====== CHẾ ĐỘ ẢNH: dùng ảnh chụp thật (iq/cauN.png), người chơi chọn A–F ======
+  Q.length=0;
+  const IQN=24;                                        // số câu hiện có ảnh
+  const IQANS=['F','E','B','B','A','C','D','A','C','B','C','E','F','A','C','F','B','B','D','B','','','','']; // đáp án đúng A–F (câu 21–24 để trống: công bố sau)
+  for(let i=1;i<=IQN;i++)Q.push({img:'iq/cau'+i+'.png',answer:(IQANS[i-1]||''),n:i});
+
+  // =================== GIAO DIỆN / ĐIỀU KHIỂN ===================
+  const LIMIT=20*60; // giây
+  let mounted=false,cur=0,answers,startAt,timer,left;
+  const root=()=>document.getElementById('view-iqtest');
+
+  function mount(){ if(!mounted){ renderStart(); mounted=true; } }
+
+  function renderStart(){
+    root().innerHTML=`<div class="card">
+      <h2 style="margin-top:0">🧠 Bài Test IQ — Ma trận hình học</h2>
+      <div class="sub">${Q.length} câu suy luận hình ảnh (phi ngôn ngữ): nhìn ma trận, tìm hình còn thiếu. Thời gian ${LIMIT/60} phút.</div>
+      <ul style="color:var(--muted);font-size:14px;line-height:1.7;padding-left:20px;margin:0 0 16px">
+        <li>Mỗi câu có 6 phương án trong ảnh — chọn bằng nút <b>A B C</b> (hàng trên) · <b>D E F</b> (hàng dưới), tính từ trái sang phải.</li>
+        <li>Có thể bấm số câu để nhảy qua lại; nộp bài để xem kết quả.</li>
+        <li>Chỉ số IQ ước lượng chỉ mang tính tham khảo/luyện tập.</li>
+      </ul>
+      <div style="background:#fff7e6;border:1px solid #ffe2a8;color:#b06f00;padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:14px">🏆 <b>Kết quả chính thức công bố lúc 22:00 Chủ nhật hằng tuần.</b> Câu 21–24 là câu quyết định — đáp án &amp; giải thích sẽ công bố cùng lúc.</div>
+      <button class="btn big" id="iqStart">Bắt đầu làm bài ▶</button>
+    </div>`;
+    root().querySelector('#iqStart').onclick=start;
+  }
+
+  function start(){
+    cur=0; answers=Array(Q.length).fill(null); left=LIMIT; startAt=Date.now();
+    root().innerHTML=`
+      <div class="card">
+        <div class="iq-head">
+          <span class="iq-qno" id="iqQno">Câu số 1</span>
+          <span class="iq-time"><span class="lbl">Thời gian còn</span><span id="iqTime">20:00</span></span>
+        </div>
+        <div class="iq-prog"><i id="iqBar"></i></div>
+        <div class="iq-board" id="iqBoard"></div>
+        <div style="text-align:center;color:var(--muted);font-size:13px;margin:12px 0 6px">Chọn phương án đúng — <b>A B C</b> (hàng trên) · <b>D E F</b> (hàng dưới), từ trái sang phải trong ảnh</div>
+        <div class="iq-opts letters" id="iqOpts"></div>
+        <div class="iq-pad" id="iqPad"></div>
+        <div class="iq-nav">
+          <button class="btn ghost" id="iqPrev">← Câu trước</button>
+          <button class="btn" id="iqNext">Câu sau →</button>
+        </div>
+      </div>`;
+    root().querySelector('#iqPrev').onclick=()=>{if(cur>0){cur--;renderQ();}};
+    root().querySelector('#iqNext').onclick=()=>{
+      if(cur===Q.length-1){const un=answers.filter(a=>a===null).length;if(un>0&&!confirm('Còn '+un+' câu chưa trả lời. Nộp bài luôn?'))return;finish();}
+      else{cur++;renderQ();}
+    };
+    clearInterval(timer);
+    timer=setInterval(()=>{left--;const t=root().querySelector('#iqTime');if(!t){clearInterval(timer);return;}if(left<=0){clearInterval(timer);finish();return;}t.textContent=fmt(left);},1000);
+    renderQ();
+  }
+  function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+
+  function renderQ(){
+    const q=Q[cur];
+    root().querySelector('#iqQno').textContent='Câu số '+(cur+1);
+    root().querySelector('#iqBar').style.width=Math.round(cur/Q.length*100)+'%';
+    const img=document.createElement('img');img.className='iq-qimg';img.src=q.img;img.alt='Câu '+(cur+1);
+    img.onerror=function(){const d=document.createElement('div');d.className='iq-noimg';d.textContent='(chưa có ảnh: '+q.img+')';img.replaceWith(d);};
+    const bd=root().querySelector('#iqBoard');bd.innerHTML='';bd.appendChild(img);
+    const ob=root().querySelector('#iqOpts'); ob.className='iq-opts letters'; ob.innerHTML='';
+    ['A','B','C','D','E','F'].forEach(L=>{const d=document.createElement('button');d.className='iq-opt iq-letter'+(answers[cur]===L?' sel':'');d.textContent=L;d.onclick=()=>{answers[cur]=L;renderQ();};ob.appendChild(d);});
+    const pad=root().querySelector('#iqPad'); pad.innerHTML='';
+    for(let i=0;i<Q.length;i++){const b=document.createElement('button');b.className='iq-pn'+(i===cur?' cur':(answers[i]!=null?' done':''));b.textContent=i+1;b.onclick=()=>{cur=i;renderQ();};pad.appendChild(b);}
+    root().querySelector('#iqPrev').disabled=(cur===0);
+    root().querySelector('#iqNext').textContent=(cur===Q.length-1)?'Nộp bài ✓':'Câu sau →';
+  }
+
+  function finish(){
+    clearInterval(timer);
+    const answered=answers.filter(a=>a!=null).length;
+    const used=Math.min(LIMIT,Math.floor((Date.now()-startAt)/1000));
+    root().innerHTML=`
+      <div class="card" style="text-align:center">
+        <div style="font-size:54px;line-height:1;margin-bottom:8px">✅</div>
+        <h2 style="margin:0 0 6px">Đã nộp bài thành công!</h2>
+        <div style="color:var(--muted);margin-bottom:18px">Bạn đã trả lời <b style="color:var(--ink)">${answered}/${Q.length}</b> câu · thời gian làm <b style="color:var(--ink)">${fmt(used)}</b>.</div>
+        <div style="background:#fff7e6;border:1px solid #ffe2a8;color:#b06f00;padding:16px;border-radius:12px;font-size:15px;margin-bottom:18px;line-height:1.6">
+          🏆 <b>Kết quả, đáp án &amp; xếp hạng chính thức được công bố lúc 22:00 Chủ nhật hằng tuần.</b><br>
+          <span style="font-size:13px">Để không lộ đáp án, hệ thống không hiển thị điểm hay lời giải ngay. Hẹn gặp bạn ở buổi công bố nhé!</span>
+        </div>
+        <button class="btn" id="iqAgain">🔄 Làm bài khác</button>
+      </div>`;
+    root().querySelector('#iqAgain').onclick=start;
+    window.scrollTo(0,0);
+  }
+
+  window.IQ={mount:mount};
 })();
 </script>
 </body>

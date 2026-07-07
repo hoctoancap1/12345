@@ -1,2 +1,5 @@
 fpt_key.txt
 __pycache__/
+iq_raw/
+iq_gallery.html
+crop_iq.py
