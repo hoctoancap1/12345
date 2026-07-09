@@ -253,6 +253,18 @@ try{
     <div id="codeErr" style="display:none;font-size:14px;margin-top:8px"></div>
     <button id="codeBtn" style="margin-top:14px;width:100%;background:#4f6ef7;color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer">Mở khóa →</button>
     <div style="margin-top:12px"><a id="codeCancel" style="color:#9aa3b8;font-size:14px;cursor:pointer;text-decoration:underline">Để sau</a></div>
+    <div style="margin-top:16px;border-top:1px solid #eef1f7;padding-top:14px">
+      <a id="buyToggle" style="color:#4f6ef7;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline">🛒 Chưa có mã? Bấm để mua mã</a>
+      <div id="buyBox" style="display:none;margin-top:14px;text-align:left">
+        <div style="background:#fffdf5;border:1px solid #ffe6a8;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.65;color:#5b4a1e">
+          <b>Cách nhận mã:</b>
+          <div style="margin-top:6px">1️⃣ Chuyển khoản <b>300.000đ</b> theo mã QR bên dưới, nhớ <b>ghi chú số điện thoại của bạn</b>.</div>
+          <div style="margin-top:4px">2️⃣ Kết bạn <b>Zalo 0977945584</b> để nhận mã kích hoạt.</div>
+        </div>
+        <img src="qr_mua_ma.png" alt="QR chuyển khoản VietinBank" style="width:100%;max-width:300px;display:block;margin:14px auto 0;border-radius:12px;border:1px solid #eef1f7" />
+        <div style="text-align:center;font-size:13px;color:#6b7794;margin-top:8px;line-height:1.6">VietinBank · <b>101006688720</b> · TRAN VAN NINH<br>Số tiền <b>300.000đ</b> · Nội dung: <b>SĐT của bạn</b></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2344,6 +2356,8 @@ function showCodeGate(onOk){
   btn.onclick=go;
   inp.onkeydown=function(e){if(e.key==='Enter')go();};
   document.getElementById('codeCancel').onclick=function(){m.style.display='none';};
+  var bt=document.getElementById('buyToggle'),bb=document.getElementById('buyBox');
+  if(bt&&bb){bb.style.display='none';bt.onclick=function(){bb.style.display=(bb.style.display==='none'?'block':'none');};}
 }
 function updateCodeStatus(){
   var s=document.getElementById('codeStatus'),b=document.getElementById('enterCodeBtn');if(!s)return;

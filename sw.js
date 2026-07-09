@@ -1,5 +1,5 @@
 /* Service worker cho Gia Sư AI (PWA) */
-const VERSION = 'gsai-v8';
+const VERSION = 'gsai-v9';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.5/';
 const CORE = [
   './',
