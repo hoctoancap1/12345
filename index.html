@@ -96,6 +96,12 @@
   .lesson-meta .d{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lesson-stars{flex-shrink:0;font-size:15px;letter-spacing:1px;color:var(--gold)}
   .lesson-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;flex-shrink:0}
+  .lesson-prog{display:flex;align-items:center;gap:8px;margin-top:7px}
+  .lp-bar{flex:1;max-width:200px;height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+  .lp-bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#8b5cf6);border-radius:99px;transition:width .4s}
+  .lp-bar.ok>i{background:var(--green)}
+  .lp-pct{font-size:12px;font-weight:800;color:var(--brand-dark);min-width:38px}
+  .lp-pct.ok{color:var(--green)}
   .tag-current{background:var(--brand-soft);color:var(--brand-dark)}
   .tag-locked{background:#eef0f5;color:var(--lock)}
 
@@ -1912,11 +1918,14 @@ function renderCurriculum(){
   html+='</div>';
   CUR.lessons.forEach((les,i)=>{
     const r=progress.results[i];
-    const unlocked=settings.unlockAll||i<=progress.currentIndex;
-    let numCls='locked',num='🔒',tag='<span class="lesson-tag tag-locked">Khóa</span>',stars='';
-    if(r&&r.passed){numCls='done';num='✓';stars='<span class="lesson-stars">'+starStr(r.stars||0)+'</span>';tag='';}
-    else if(unlocked){numCls='current';num=i+1;tag='<span class="lesson-tag tag-current">▶ Học ngay</span>';}
-    html+='<div class="lesson-item '+(unlocked?'open':'locked')+'" data-idx="'+i+'"><div class="lesson-num '+numCls+'">'+num+'</div><div class="lesson-meta"><div class="t">'+(i+1)+'. '+esc(les.title)+'</div><div class="d">'+esc(les.desc||'')+'</div></div>'+stars+tag+'</div>';
+    // Tất cả bài đều CÔNG KHAI. Mức hoàn thiện = điểm kiểm tra cao nhất / tổng số câu.
+    const bt=(r&&r.bestTotal)?r.bestTotal:QPER;
+    const pctL=(r&&r.bestScore!=null)?Math.min(100,Math.round(r.bestScore/bt*100)):0;
+    const okCls=(r&&r.passed)?' ok':'';
+    let numCls='current',num=i+1,stars='';
+    if(r&&r.passed){numCls='done';num='✓';stars='<span class="lesson-stars">'+starStr(r.stars||0)+'</span>';}
+    const prog='<div class="lesson-prog"><div class="lp-bar'+okCls+'"><i style="width:'+pctL+'%"></i></div><span class="lp-pct'+okCls+'">'+pctL+'%</span></div>';
+    html+='<div class="lesson-item open" data-idx="'+i+'"><div class="lesson-num '+numCls+'">'+num+'</div><div class="lesson-meta"><div class="t">'+(i+1)+'. '+esc(les.title)+'</div><div class="d">'+esc(les.desc||'')+'</div>'+prog+'</div>'+stars+'</div>';
   });
   vCurr.innerHTML=html;
   vCurr.querySelectorAll('.lesson-item.open').forEach(el=>el.onclick=()=>openLesson(parseInt(el.dataset.idx)));
