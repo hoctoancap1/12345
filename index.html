@@ -2629,10 +2629,19 @@ updateCodeStatus();
   let mounted=false,cur=0,answers,startAt,timer,left;
   const root=()=>document.getElementById('view-iqtest');
 
-  // ----- giới hạn lượt theo tuần (ISO week) -----
+  // ----- lượt + kết quả trên Firestore (định danh theo SĐT phụ huynh), fallback localStorage -----
   function weekKey(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+4-(d.getDay()||7));const y0=new Date(d.getFullYear(),0,1);const wk=Math.ceil((((d-y0)/86400000)+1)/7);return d.getFullYear()+'-W'+wk;}
-  function getAttempts(){try{const a=JSON.parse(localStorage.getItem('iq_attempts')||'{}');if(a.wk===weekKey())return {wk:a.wk,n:a.n||0};}catch(e){}return {wk:weekKey(),n:0};}
-  function addAttempt(){const a=getAttempts();a.n++;localStorage.setItem('iq_attempts',JSON.stringify(a));return a;}
+  function iqProfile(){try{if(typeof profile!=='undefined'&&profile)return profile;}catch(e){}try{return JSON.parse(localStorage.getItem('gsai_profile')||'null');}catch(e){}return null;}
+  function iqPhone(){const pr=iqProfile();const p=(pr&&pr.parentPhone)||'';return String(p).replace(/\D/g,'');}
+  function iqName(){const pr=iqProfile();return ((pr&&pr.name)||'').trim()||'Học sinh';}
+  function fsAvail(){return typeof firebase!=='undefined'&&firebase.firestore;}
+  function iqRef(){if(!fsAvail())return null;const ph=iqPhone();return ph?firebase.firestore().collection('iqResults').doc(ph):null;}
+  function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej('to'),ms))]);}
+  function localAttempts(){try{const a=JSON.parse(localStorage.getItem('iq_attempts')||'{}');if(a.wk===weekKey())return a.n||0;}catch(e){}return 0;}
+  function setLocalAttempts(n){try{localStorage.setItem('iq_attempts',JSON.stringify({wk:weekKey(),n:n}));}catch(e){}}
+  async function loadAttempts(){const ref=iqRef();const loc=localAttempts();if(!ref)return loc;try{const snap=await withTimeout(ref.get(),4000);if(snap&&snap.exists){const at=(snap.data()||{}).attempts||{};const n=(at.week===weekKey())?(at.n||0):0;return Math.max(n,loc);}}catch(e){}return loc;}
+  async function saveResult(correct,used,iq){const week=weekKey();setLocalAttempts(localAttempts()+1);const ref=iqRef();if(!ref)return;try{await firebase.firestore().runTransaction(async(tx)=>{const snap=await tx.get(ref);const d=snap.exists?(snap.data()||{}):{};const at=d.attempts||{};const n=(at.week===week)?(at.n||0):0;const upd={phone:iqPhone(),name:iqName(),attempts:{week:week,n:n+1},updated:Date.now()};if(!(typeof d.bestIq==='number'&&d.bestIq>=iq)){upd.bestIq=iq;upd.bestCorrect=correct;upd.bestTime=used;upd.bestAt=Date.now();}tx.set(ref,upd,{merge:true});});}catch(e){}}
+  async function rankPercentile(myIq){if(!fsAvail())return null;try{const qs=await withTimeout(firebase.firestore().collection('iqResults').get(),5000);const iqs=[];qs.forEach(doc=>{const v=(doc.data()||{}).bestIq;if(typeof v==='number')iqs.push(v);});const n=iqs.length;if(n<8)return {pct:null,n:n};const below=iqs.filter(v=>v<myIq).length;return {pct:Math.max(1,Math.min(99,Math.round(below/n*100))),n:n};}catch(e){return null;}}
 
   // ----- điểm -> IQ -> phần trăm vượt qua -----
   function normCdf(z){const t=1/(1+0.2316419*Math.abs(z));const d=0.3989423*Math.exp(-z*z/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
@@ -2650,10 +2659,11 @@ updateCodeStatus();
     return {t:'Cần luyện tập thêm',pop:'~2,2% dân số',cls:'no'};
   }
 
-  function mount(){ if(!mounted){ renderStart(); mounted=true; } }
+  function mount(){ mounted=true; clearInterval(timer); renderStart(); }
 
-  function renderStart(){
-    const at=getAttempts(); const remain=Math.max(0,MAX_WEEK-at.n); const out=remain<=0;
+  function renderStart(){ paintStart(localAttempts()); loadAttempts().then(n=>{ if(n!==localAttempts()||n>=MAX_WEEK) paintStart(n); }); }
+  function paintStart(n){
+    const remain=Math.max(0,MAX_WEEK-n); const out=remain<=0;
     root().innerHTML=`<div class="card">
       <h2 style="margin-top:0">🧠 Bài Test IQ — Ma trận hình học</h2>
       <div class="sub">${Q.length} câu suy luận hình ảnh (phi ngôn ngữ): nhìn ma trận, tìm hình còn thiếu. Giới hạn ${LIMIT/60} phút.</div>
@@ -2661,18 +2671,19 @@ updateCodeStatus();
         <li>Mỗi câu có 6 phương án trong ảnh — chọn bằng nút <b>A B C</b> (hàng trên) · <b>D E F</b> (hàng dưới), tính từ trái sang phải.</li>
         <li>Điểm dựa trên <b>số câu đúng</b> và <b>thời gian làm</b> — làm đúng &amp; nhanh thì điểm càng cao.</li>
         <li>Nộp bài xong biết ngay <b>IQ ước lượng</b> và bạn <b>vượt qua bao nhiêu %</b> người tham gia.</li>
-        <li>Mỗi tuần được làm tối đa <b>${MAX_WEEK} lượt</b>.</li>
+        <li>Mỗi tuần được làm tối đa <b>${MAX_WEEK} lượt</b> (tính theo SĐT phụ huynh).</li>
       </ul>
       <div style="background:${out?'#fdecec':'#eef6ff'};border:1px solid ${out?'#f5b5b5':'#c5dbf5'};color:${out?'#b02a2a':'#1e4a8a'};padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:14px">
         ${out?'⛔ Bạn đã dùng hết '+MAX_WEEK+' lượt trong tuần này. Vui lòng quay lại tuần sau nhé!':'📅 Tuần này bạn còn <b>'+remain+'/'+MAX_WEEK+' lượt</b>.'}
       </div>
       <button class="btn big" id="iqStart"${out?' disabled':''}>Bắt đầu làm bài ▶</button>
     </div>`;
-    const b=root().querySelector('#iqStart'); if(b&&!out)b.onclick=start;
+    const b=root().querySelector('#iqStart'); if(b&&!out)b.onclick=onStartClick;
   }
+  async function onStartClick(){ const b=root().querySelector('#iqStart'); if(b)b.disabled=true; const n=await loadAttempts(); if(n>=MAX_WEEK){paintStart(n);return;} start(); }
 
   function start(){
-    if(getAttempts().n>=MAX_WEEK){renderStart();return;}
+    if(localAttempts()>=MAX_WEEK){renderStart();return;}
     cur=0; answers=Array(Q.length).fill(null); left=LIMIT; startAt=Date.now();
     root().innerHTML=`
       <div class="card">
@@ -2716,33 +2727,47 @@ updateCodeStatus();
     root().querySelector('#iqNext').textContent=(cur===Q.length-1)?'Nộp bài ✓':'Câu sau →';
   }
 
-  function finish(){
+  async function finish(){
     clearInterval(timer);
     const used=Math.min(LIMIT,Math.floor((Date.now()-startAt)/1000));
     let correct=0; Q.forEach((q,i)=>{if(q.answer&&answers[i]===q.answer)correct++;});
     const iq=scoreToIQ(correct,Q.length,used);
-    const pct=Math.max(1,Math.min(99,Math.round(normCdf((iq-100)/15)*100)));
+    const estPct=Math.max(1,Math.min(99,Math.round(normCdf((iq-100)/15)*100)));
     const bd=iqBand(iq);
-    const iqLo=Math.max(55,iq-4), iqHi=Math.min(150,iq+4);
-    const at=addAttempt(); const remain=Math.max(0,MAX_WEEK-at.n);
+    const iqLo=Math.max(50,iq-4), iqHi=Math.min(140,iq+4);
+    await saveResult(correct,used,iq).catch(()=>{});
+    const remain=Math.max(0,MAX_WEEK-localAttempts());
     root().innerHTML=`
       <div class="card" style="text-align:center">
         <div class="sub" style="margin:0">Kết quả của bạn</div>
         <div class="iq-iq" style="margin:4px 0 0">IQ ≈ ${iqLo}–${iqHi}</div>
         <div style="font-weight:800;color:var(--brand-dark);font-size:15px">${bd.t}${bd.pop?' · '+bd.pop:''}</div>
-        <div style="font-size:44px;font-weight:800;color:var(--green);margin:16px 0 0">Vượt qua ${pct}%</div>
-        <div style="color:var(--muted);margin-bottom:16px">người tham gia</div>
+        <div style="font-size:44px;font-weight:800;color:var(--green);margin:16px 0 0" id="iqPctBig">Vượt qua ${estPct}%</div>
+        <div style="color:var(--muted);margin-bottom:16px" id="iqPctSub">người tham gia (đang xếp hạng…)</div>
         <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:16px">
           <div><b style="color:var(--ink);font-size:18px">${correct}/${Q.length}</b><br>Câu đúng</div>
           <div><b style="color:var(--ink);font-size:18px">${fmt(used)}</b><br>Thời gian làm</div>
         </div>
-        <div style="background:#eef6ff;border:1px solid #c5dbf5;color:#1e4a8a;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;line-height:1.55">
-          Ước lượng dựa trên <b>số câu đúng</b> &amp; <b>tốc độ làm bài</b>, so trên phân phối chuẩn (trung bình 100, độ lệch chuẩn 15) — chỉ mang tính tham khảo.<br>Tuần này bạn còn <b>${remain}/${MAX_WEEK} lượt</b>.
+        <div style="background:#eef6ff;border:1px solid #c5dbf5;color:#1e4a8a;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;line-height:1.55" id="iqResNote">
+          Đang xếp hạng so với người tham gia…<br>Tuần này bạn còn <b>${remain}/${MAX_WEEK} lượt</b>.
         </div>
         <button class="btn" id="iqAgain">${remain>0?'🔄 Làm lại':'⬅ Về đầu'}</button>
       </div>`;
     root().querySelector('#iqAgain').onclick=()=>renderStart();
     window.scrollTo(0,0);
+    // xếp hạng thật (nếu đủ người) — cập nhật sau
+    const r=await rankPercentile(iq);
+    const big=root().querySelector('#iqPctBig'), sub=root().querySelector('#iqPctSub'), note=root().querySelector('#iqResNote');
+    if(!big||!sub||!note)return;
+    if(r&&r.pct!=null){
+      big.textContent='Vượt qua '+r.pct+'%';
+      sub.textContent='trong '+r.n+' người tham gia';
+      note.innerHTML='Xếp hạng thật so với <b>'+r.n+' người</b> đã làm bài (theo điểm cao nhất mỗi người).<br>Tuần này bạn còn <b>'+remain+'/'+MAX_WEEK+' lượt</b>.';
+    }else{
+      const nn=r?r.n:0;
+      sub.textContent='người tham gia (ước lượng)';
+      note.innerHTML='Mới có <b>'+nn+' người</b> tham gia nên tạm ước lượng theo phân phối chuẩn (TB 100, ĐLC 15). Càng nhiều người làm, xếp hạng càng chính xác.<br>Tuần này bạn còn <b>'+remain+'/'+MAX_WEEK+' lượt</b>.';
+    }
   }
 
   window.IQ={mount:mount};
