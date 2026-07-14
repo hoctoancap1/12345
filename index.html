@@ -2619,33 +2619,60 @@ updateCodeStatus();
 
   // ====== CHẾ ĐỘ ẢNH: dùng ảnh chụp thật (iq/cauN.png), người chơi chọn A–F ======
   Q.length=0;
-  const IQN=24;                                        // số câu hiện có ảnh
-  const IQANS=['F','E','B','B','A','C','D','A','C','B','C','E','F','A','C','F','B','B','D','B','','','','']; // đáp án đúng A–F (câu 21–24 để trống: công bố sau)
+  const IQN=20;                                        // số câu (đã bỏ 21–24)
+  const IQANS=['F','E','B','B','A','C','D','A','C','B','C','E','F','A','C','F','B','B','D','B']; // đáp án đúng A–F cho 20 câu
   for(let i=1;i<=IQN;i++)Q.push({img:'iq/cau'+i+'.png',answer:(IQANS[i-1]||''),n:i});
 
   // =================== GIAO DIỆN / ĐIỀU KHIỂN ===================
   const LIMIT=20*60; // giây
+  const MAX_WEEK=2;  // số lượt tối đa mỗi tuần
   let mounted=false,cur=0,answers,startAt,timer,left;
   const root=()=>document.getElementById('view-iqtest');
+
+  // ----- giới hạn lượt theo tuần (ISO week) -----
+  function weekKey(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+4-(d.getDay()||7));const y0=new Date(d.getFullYear(),0,1);const wk=Math.ceil((((d-y0)/86400000)+1)/7);return d.getFullYear()+'-W'+wk;}
+  function getAttempts(){try{const a=JSON.parse(localStorage.getItem('iq_attempts')||'{}');if(a.wk===weekKey())return {wk:a.wk,n:a.n||0};}catch(e){}return {wk:weekKey(),n:0};}
+  function addAttempt(){const a=getAttempts();a.n++;localStorage.setItem('iq_attempts',JSON.stringify(a));return a;}
+
+  // ----- điểm -> IQ -> phần trăm vượt qua -----
+  function normCdf(z){const t=1/(1+0.2316419*Math.abs(z));const d=0.3989423*Math.exp(-z*z/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
+  function scoreToIQ(correct,total,usedSec){
+    const acc=total?correct/total:0;
+    const timeRatio=Math.min(1,usedSec/LIMIT);
+    const s=acc*0.90+(1-timeRatio)*0.10;          // ưu tiên số câu đúng (90%) + tốc độ (10%)
+    return Math.max(50,Math.min(140,Math.round(60+s*75)));
+  }
+  function iqBand(iq){
+    if(iq>=130)return {t:'Thiên tài / cực kỳ thông minh',pop:'top ~2,2% dân số',cls:'ok'};
+    if(iq>=115)return {t:'Thông minh vượt trội',pop:'~13,5% dân số',cls:'ok'};
+    if(iq>=85) return {t:'Trí thông minh bình thường',pop:'~68% dân số',cls:'na'};
+    if(iq>=70) return {t:'Dưới trung bình',pop:'',cls:'na'};
+    return {t:'Cần luyện tập thêm',pop:'~2,2% dân số',cls:'no'};
+  }
 
   function mount(){ if(!mounted){ renderStart(); mounted=true; } }
 
   function renderStart(){
+    const at=getAttempts(); const remain=Math.max(0,MAX_WEEK-at.n); const out=remain<=0;
     root().innerHTML=`<div class="card">
       <h2 style="margin-top:0">🧠 Bài Test IQ — Ma trận hình học</h2>
-      <div class="sub">${Q.length} câu suy luận hình ảnh (phi ngôn ngữ): nhìn ma trận, tìm hình còn thiếu. Thời gian ${LIMIT/60} phút.</div>
+      <div class="sub">${Q.length} câu suy luận hình ảnh (phi ngôn ngữ): nhìn ma trận, tìm hình còn thiếu. Giới hạn ${LIMIT/60} phút.</div>
       <ul style="color:var(--muted);font-size:14px;line-height:1.7;padding-left:20px;margin:0 0 16px">
         <li>Mỗi câu có 6 phương án trong ảnh — chọn bằng nút <b>A B C</b> (hàng trên) · <b>D E F</b> (hàng dưới), tính từ trái sang phải.</li>
-        <li>Có thể bấm số câu để nhảy qua lại; nộp bài để xem kết quả.</li>
-        <li>Chỉ số IQ ước lượng chỉ mang tính tham khảo/luyện tập.</li>
+        <li>Điểm dựa trên <b>số câu đúng</b> và <b>thời gian làm</b> — làm đúng &amp; nhanh thì điểm càng cao.</li>
+        <li>Nộp bài xong biết ngay <b>IQ ước lượng</b> và bạn <b>vượt qua bao nhiêu %</b> người tham gia.</li>
+        <li>Mỗi tuần được làm tối đa <b>${MAX_WEEK} lượt</b>.</li>
       </ul>
-      <div style="background:#fff7e6;border:1px solid #ffe2a8;color:#b06f00;padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:14px">🏆 <b>Kết quả chính thức công bố lúc 22:00 Chủ nhật hằng tuần.</b> Câu 21–24 là câu quyết định — đáp án &amp; giải thích sẽ công bố cùng lúc.</div>
-      <button class="btn big" id="iqStart">Bắt đầu làm bài ▶</button>
+      <div style="background:${out?'#fdecec':'#eef6ff'};border:1px solid ${out?'#f5b5b5':'#c5dbf5'};color:${out?'#b02a2a':'#1e4a8a'};padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:14px">
+        ${out?'⛔ Bạn đã dùng hết '+MAX_WEEK+' lượt trong tuần này. Vui lòng quay lại tuần sau nhé!':'📅 Tuần này bạn còn <b>'+remain+'/'+MAX_WEEK+' lượt</b>.'}
+      </div>
+      <button class="btn big" id="iqStart"${out?' disabled':''}>Bắt đầu làm bài ▶</button>
     </div>`;
-    root().querySelector('#iqStart').onclick=start;
+    const b=root().querySelector('#iqStart'); if(b&&!out)b.onclick=start;
   }
 
   function start(){
+    if(getAttempts().n>=MAX_WEEK){renderStart();return;}
     cur=0; answers=Array(Q.length).fill(null); left=LIMIT; startAt=Date.now();
     root().innerHTML=`
       <div class="card">
@@ -2691,20 +2718,30 @@ updateCodeStatus();
 
   function finish(){
     clearInterval(timer);
-    const answered=answers.filter(a=>a!=null).length;
     const used=Math.min(LIMIT,Math.floor((Date.now()-startAt)/1000));
+    let correct=0; Q.forEach((q,i)=>{if(q.answer&&answers[i]===q.answer)correct++;});
+    const iq=scoreToIQ(correct,Q.length,used);
+    const pct=Math.max(1,Math.min(99,Math.round(normCdf((iq-100)/15)*100)));
+    const bd=iqBand(iq);
+    const iqLo=Math.max(55,iq-4), iqHi=Math.min(150,iq+4);
+    const at=addAttempt(); const remain=Math.max(0,MAX_WEEK-at.n);
     root().innerHTML=`
       <div class="card" style="text-align:center">
-        <div style="font-size:54px;line-height:1;margin-bottom:8px">✅</div>
-        <h2 style="margin:0 0 6px">Đã nộp bài thành công!</h2>
-        <div style="color:var(--muted);margin-bottom:18px">Bạn đã trả lời <b style="color:var(--ink)">${answered}/${Q.length}</b> câu · thời gian làm <b style="color:var(--ink)">${fmt(used)}</b>.</div>
-        <div style="background:#fff7e6;border:1px solid #ffe2a8;color:#b06f00;padding:16px;border-radius:12px;font-size:15px;margin-bottom:18px;line-height:1.6">
-          🏆 <b>Kết quả, đáp án &amp; xếp hạng chính thức được công bố lúc 22:00 Chủ nhật hằng tuần.</b><br>
-          <span style="font-size:13px">Để không lộ đáp án, hệ thống không hiển thị điểm hay lời giải ngay. Hẹn gặp bạn ở buổi công bố nhé!</span>
+        <div class="sub" style="margin:0">Kết quả của bạn</div>
+        <div class="iq-iq" style="margin:4px 0 0">IQ ≈ ${iqLo}–${iqHi}</div>
+        <div style="font-weight:800;color:var(--brand-dark);font-size:15px">${bd.t}${bd.pop?' · '+bd.pop:''}</div>
+        <div style="font-size:44px;font-weight:800;color:var(--green);margin:16px 0 0">Vượt qua ${pct}%</div>
+        <div style="color:var(--muted);margin-bottom:16px">người tham gia</div>
+        <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:16px">
+          <div><b style="color:var(--ink);font-size:18px">${correct}/${Q.length}</b><br>Câu đúng</div>
+          <div><b style="color:var(--ink);font-size:18px">${fmt(used)}</b><br>Thời gian làm</div>
         </div>
-        <button class="btn" id="iqAgain">🔄 Làm bài khác</button>
+        <div style="background:#eef6ff;border:1px solid #c5dbf5;color:#1e4a8a;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;line-height:1.55">
+          Ước lượng dựa trên <b>số câu đúng</b> &amp; <b>tốc độ làm bài</b>, so trên phân phối chuẩn (trung bình 100, độ lệch chuẩn 15) — chỉ mang tính tham khảo.<br>Tuần này bạn còn <b>${remain}/${MAX_WEEK} lượt</b>.
+        </div>
+        <button class="btn" id="iqAgain">${remain>0?'🔄 Làm lại':'⬅ Về đầu'}</button>
       </div>`;
-    root().querySelector('#iqAgain').onclick=start;
+    root().querySelector('#iqAgain').onclick=()=>renderStart();
     window.scrollTo(0,0);
   }
 
